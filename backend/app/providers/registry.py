@@ -75,15 +75,37 @@ class ModelRegistry:
                 tags=["vision", "multimodal", "robotics", "argon-tier", "engineering"]
             ),
             ModelInfo(
-                id="meta/llama-3.2-90b-vision-instruct",
-                name="Llama 3.2 90B Vision",
+                id="nvidia/cosmos-predict1-7b",
+                name="NVIDIA Cosmos WFM (Video)",
                 provider="NVIDIA NIM",
-                description="Meta'nın en gelişmiş 90 Milyar parametreli multimodal görsel modeli; devreler, grafikler, optik karakterler ve teknik şemalar.",
-                category="Görsel & Multimodal (Llama 3.2 Vision)",
+                description="Gemini Omni 1.2 & Google Veo 2 muadili. 15s fiziksel dünya simülasyonu, Navier-Stokes akışkanlar dinamiği, ARRI 35mm sinematografi, tek plan sekans ve fotogerçekçi video üretimi.",
+                category="🎬 Video & Dünya Modeli (Gemini Omni 1.2 Muadili)",
                 context_length=128000,
                 is_available=True,
                 is_default=False,
-                tags=["vision", "multimodal", "llama-tier"]
+                tags=["video", "world-model", "cosmos", "omni-tier", "cinematic"]
+            ),
+            ModelInfo(
+                id="wan-video/wan-2.1-14b",
+                name="Wan 2.1 Cinema 14B",
+                provider="NVIDIA NIM",
+                description="VBench ~84.7% dünya lideri (Sora & Veo 2 rakibi). 3D Causal VAE ile ARRI Alexa estetiğinde fotogerçekçi doku, yağmur/su kırılması ve insan cildi detayı.",
+                category="🎥 Sinematik Video Üretimi (Wan 2.1)",
+                context_length=128000,
+                is_available=True,
+                is_default=False,
+                tags=["video", "cinematic", "wan", "sora-tier"]
+            ),
+            ModelInfo(
+                id="mistralai/mistral-large-4-1t-a52b",
+                name="Mistral Large 4 1T",
+                provider="NVIDIA NIM",
+                description="Claude Sonnet 4.6 muadili. 1 Trilyon token bağlamlı derin muhakeme, analitik ve çok dilli genel zekâ.",
+                category="İleri Düzey Akıl Yürütme (Sonnet 4.6 Muadili)",
+                context_length=128000,
+                is_available=True,
+                is_default=False,
+                tags=["reasoning", "general", "mistral-tier"]
             ),
             ModelInfo(
                 id="nvidia/riva-translate-4b-instruct-v2",

@@ -3,6 +3,20 @@ from typing import Dict, List
 from app.schemas.router import RouteResponse
 
 CATEGORY_CONFIG = {
+    "video_world_generation": {
+        "label": "Video & Dünya Simülasyonu (Cosmos & Wan 2.1)",
+        "keywords": [
+            "video", "film", "cinematic", "arri", "alexa", "camera", "shot", "9:16", "16:9", "fps",
+            "shutter", "continuous", "live-action", "photorealistic", "istanbul", "kamera", "çekim",
+            "sahne", "klip", "sinematik", "animasyon", "render", "footage", "lens", "veo", "sora", "cosmos", "wan"
+        ],
+        "regex": [r"\b(?:9:16|16:9|24\s*fps|arri|alexa|cinematic|camera shot|video)\b", r"\bvideo\w*\b", r"\bsinematik\b"],
+        "recommended_models": [
+            "nvidia/cosmos-predict1-7b",
+            "wan-video/wan-2.1-14b"
+        ],
+        "description": "Gemini Omni 1.2 & Veo 2 kalibresinde 15s fiziksel dünya simülasyonu ve ARRI sinematografisi (NVIDIA Cosmos WFM & Wan 2.1) hedeflendi."
+    },
     "vision_circuit": {
         "label": "Görsel & Devre Şeması Analizi (Vision Modelleri)",
         "keywords": [

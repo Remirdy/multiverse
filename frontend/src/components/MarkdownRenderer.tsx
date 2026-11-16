@@ -3,6 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
+import rehypeRaw from 'rehype-raw';
 import { CodeBlock } from './CodeBlock';
 
 interface MarkdownRendererProps {
@@ -87,8 +88,27 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) =
     <div className="prose prose-invert prose-sm max-w-none text-slate-200 leading-relaxed space-y-2.5">
       <ReactMarkdown
         remarkPlugins={[remarkGfm, [remarkMath, { singleDollarTextMath: true }]]}
-        rehypePlugins={[[rehypeKatex, { output: 'htmlAndMathml', throwOnError: false }]]}
+        rehypePlugins={[rehypeRaw, [rehypeKatex, { output: 'htmlAndMathml', throwOnError: false }]]}
         components={{
+          video({ node, ...props }: any) {
+            return (
+              <div className="my-4 rounded-2xl overflow-hidden border border-cyan-500/40 shadow-[0_0_35px_rgba(6,182,212,0.15)] bg-black/90">
+                <div className="flex items-center justify-between px-4 py-2 bg-space-950/90 border-b border-slate-800 text-xs">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span className="font-semibold text-cyan-300">NVIDIA Cosmos WFM • 9:16 ARRI Cinema Preview</span>
+                  </div>
+                  <span className="text-[11px] text-slate-400 font-mono">1080×1920 • 24 FPS • Single Take</span>
+                </div>
+                <video
+                  {...props}
+                  controls
+                  playsInline
+                  className="w-full max-h-[460px] object-cover mx-auto"
+                />
+              </div>
+            );
+          },
           code({ inline, className, children, ...props }: any) {
             const match = /language-(\w+)/.exec(className || '');
             const value = String(children).replace(/\n$/, '');
