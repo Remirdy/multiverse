@@ -1,5 +1,5 @@
 import React from 'react';
-import { Check, X, Layers, Sparkles, Code2, Calculator, Atom, Languages, Cpu, Info } from 'lucide-react';
+import { Check, X, Layers, Sparkles, Code2, Calculator, Cpu, BookOpen, Info } from 'lucide-react';
 import { ModelInfo } from '../types';
 
 interface ModelSelectorProps {
@@ -23,55 +23,48 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
 }) => {
   if (!isOpen) return null;
 
-  // Domain-specialized preset definitions
+  // Next-Gen Frontier Presets
   const presets = [
     {
-      label: 'Specialist Trio',
+      label: 'Flagship Trio',
       icon: Sparkles,
       ids: [
-        'poolside/laguna-xs-2.1',
-        'nvidia/nemotron-3.5-lightning-30b-a3b',
-        'nvidia/nemotron-3-ultra-550b-a55b',
+        'anthropic/claude-sonnet-5.5',
+        'openai/gpt-5',
+        'google/gemini-3.8-flash',
       ],
     },
     {
-      label: 'Coding & Dev',
+      label: 'Next-Gen Code & Dev',
       icon: Code2,
       ids: [
-        'poolside/laguna-xs-2.1',
-        'nvidia/nemotron-3.5-lightning-30b-a3b',
+        'anthropic/claude-sonnet-5.5',
+        'anthropic/claude-sonnet-4.6',
+        'openai/gpt-5',
       ],
     },
     {
-      label: 'Math & Logic',
+      label: 'Deep Science & Math',
       icon: Calculator,
       ids: [
-        'nvidia/nemotron-3.5-lightning-30b-a3b',
-        'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning',
+        'openai/gpt-5',
+        'openai/4-hydrogen',
       ],
     },
     {
-      label: 'Deep Science & 550B',
-      icon: Atom,
-      ids: [
-        'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning',
-        'nvidia/nemotron-3-ultra-550b-a55b',
-      ],
-    },
-    {
-      label: 'Robotics & Hardware',
+      label: 'Systems & Robotics',
       icon: Cpu,
       ids: [
-        'nvidia/nemotron-3.5-super-vl-120b-a12b',
-        'nvidia/nemotron-3.5-bolt-e4b',
+        'openai/4-argon',
+        'anthropic/claude-sonnet-5.5',
       ],
     },
     {
-      label: 'Translation & Literature',
-      icon: Languages,
+      label: 'Philosophy & Humanities',
+      icon: BookOpen,
       ids: [
-        'nvidia/riva-translate-4b-instruct-v2',
-        'minimaxai/minimax-m3.1-flash',
+        'anthropic/claude-opus-4.6',
+        'google/gemini-3.8-flash',
       ],
     },
   ];
@@ -86,9 +79,9 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
               <Layers className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-base font-semibold text-slate-100">Specialized AI Model Registry</h2>
+              <h2 className="text-base font-semibold text-slate-100">Frontier AI Model Registry</h2>
               <p className="text-xs text-slate-400">
-                Choose specialized models tailored by domain ({selectedModelIds.length}/{maxModels} selected)
+                Compare next-generation frontier intelligence models side-by-side ({selectedModelIds.length}/{maxModels} selected)
               </p>
             </div>
           </div>
@@ -102,7 +95,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
 
         {/* Quick Presets Bar */}
         <div className="flex items-center gap-2 px-6 py-3 border-b border-slate-800/80 bg-space-950/40 overflow-x-auto custom-scrollbar">
-          <span className="text-xs font-medium text-slate-400 shrink-0 mr-1">Domains:</span>
+          <span className="text-xs font-medium text-slate-400 shrink-0 mr-1">Presets:</span>
           {presets.map((preset) => {
             const Icon = preset.icon;
             const isCurrent =
@@ -152,11 +145,9 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
                         <span className="font-semibold text-sm text-slate-100 truncate">
                           {model.name}
                         </span>
-                        {model.is_default && (
-                          <span className="text-[10px] bg-cyan-950/70 text-cyan-300 border border-cyan-800/60 px-1.5 py-0.2 rounded font-medium">
-                            Specialist Pick
-                          </span>
-                        )}
+                        <span className="text-[10px] bg-space-800 text-slate-400 border border-slate-700/60 px-1.5 py-0.2 rounded font-mono">
+                          {model.provider}
+                        </span>
                       </div>
                       <span className="inline-block text-[11px] font-mono text-slate-400 mb-2 truncate">
                         {model.id}
@@ -197,7 +188,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
         <div className="flex items-center justify-between px-6 py-4 border-t border-slate-800 bg-space-850/80">
           <div className="flex items-center gap-2 text-xs text-slate-400">
             <Info className="w-4 h-4 text-cyan-400 shrink-0" />
-            <span>Each model is chosen strictly for its verified benchmark domain specialization.</span>
+            <span>Frontier engines executing concurrently with independent millisecond benchmarking.</span>
           </div>
           <button
             onClick={onClose}

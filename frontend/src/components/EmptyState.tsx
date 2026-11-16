@@ -1,5 +1,5 @@
 import React from 'react';
-import { Terminal, Atom, Calculator, Feather, Languages, Cpu } from 'lucide-react';
+import { Terminal, Atom, Calculator, Cpu, Sparkles, BookOpen } from 'lucide-react';
 import { Logo } from './Logo';
 
 interface EmptyStateProps {
@@ -9,40 +9,40 @@ interface EmptyStateProps {
 export const EmptyState: React.FC<EmptyStateProps> = ({ onSelectPrompt }) => {
   const suggestions = [
     {
-      title: 'Coding & Systems Architecture',
+      title: 'Agentic Software Engineering',
       icon: Terminal,
-      specialist: 'Poolside Laguna XS',
-      prompt: 'Compare Python asyncio vs multiprocessing for a high-concurrency API server. Provide concrete code and benchmarks.',
+      specialist: 'Claude Sonnet 5.5',
+      prompt: 'Compare Python asyncio vs Go goroutines for a high-throughput event processing pipeline with memory leak safety.',
     },
     {
-      title: 'Formal Mathematics & Proofs',
+      title: 'Frontier Mathematical Deduction',
       icon: Calculator,
-      specialist: 'Nemotron 3.5 Lightning',
-      prompt: 'Calculate the eigenvalues and eigenvectors of a 3x3 symmetric matrix and explain the geometric transformation.',
+      specialist: 'GPT-5',
+      prompt: 'Derive the spectral theorem for compact self-adjoint operators and explain its implications in quantum state vectors.',
     },
     {
-      title: 'Deep Scientific Deduction',
+      title: 'Sub-Second Multimodal Reasoning',
+      icon: Sparkles,
+      specialist: 'Gemini 3.8 Flash',
+      prompt: 'Provide a rapid executive synthesis of how neuromorphic computing architectures differ from Von Neumann systems.',
+    },
+    {
+      title: 'Empirical Physics & Chemistry',
       icon: Atom,
-      specialist: 'Nemotron Nano Omni',
-      prompt: 'Provide a step-by-step hypothesis explaining why entropy increases monotonically in an isolated macroscopic thermodynamic system.',
+      specialist: '4-Hydrogen',
+      prompt: 'Formulate an empirical hypothesis evaluating entropy generation and microstate phase space in non-equilibrium thermodynamics.',
     },
     {
-      title: 'Multilingual Linguistics & Translation',
-      icon: Languages,
-      specialist: 'Riva Translate 4B',
-      prompt: 'Translate the concept of "Schadenfreude" and "Weltschmerz" into Turkish, explaining the exact linguistic and cultural nuances.',
-    },
-    {
-      title: 'Robotics Dynamics & Actuators',
+      title: 'Robotics Dynamics & Control',
       icon: Cpu,
-      specialist: 'Nemotron Super VL 120B',
-      prompt: 'Explain how to design an adaptive PID controller for a 6-DOF robotic manipulator arm facing varying payload inertia.',
+      specialist: '4-Argon',
+      prompt: 'Explain how to formulate the Lagrangian dynamics and non-linear inverse kinematics for an autonomous hexapod walking robot.',
     },
     {
-      title: 'Creative Fiction & Worldbuilding',
-      icon: Feather,
-      specialist: 'MiniMax M3.1 Flash',
-      prompt: 'Write an atmospheric scene opening depicting a quiet research station situated on the event horizon of a dormant Kerr black hole.',
+      title: 'Deep Systems Philosophy',
+      icon: BookOpen,
+      specialist: 'Claude Opus 4.6',
+      prompt: 'Explore the philosophical paradox of consciousness and intentionality in artificial substrates from an epistemological perspective.',
     },
   ];
 
@@ -60,9 +60,8 @@ export const EmptyState: React.FC<EmptyStateProps> = ({ onSelectPrompt }) => {
           <p className="text-sm sm:text-base text-cyan-400 font-medium tracking-wide">
             One question. Multiple minds.
           </p>
-          <p className="text-xs text-slate-400 max-w-lg mx-auto leading-relaxed">
-            Every model in Multiverse is chosen strictly for its verified benchmark domain specialization.
-            No single model is used for everything—select specialists tailored to your problem.
+          <p className="text-xs text-slate-400 max-w-xl mx-auto leading-relaxed">
+            Query next-generation frontier intelligence simultaneously. Compare <strong>GPT-5</strong>, <strong>Claude Sonnet 5.5</strong>, <strong>Claude Opus 4.6</strong>, <strong>Gemini 3.8 Flash</strong>, <strong>4-Hydrogen</strong>, and <strong>4-Argon</strong> side-by-side.
           </p>
         </div>
       </div>
