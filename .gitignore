@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+venv/
+env/
+.venv/
+
+# Build artifacts
+dist/
+dist-ssr/
+build/
+*.local
+
+# Environment variables & secrets (CRITICAL: NEVER COMMIT)
+.env
+.env.*
+*.env
+!*.env.example
+
+# Python cache & bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+multiverse.db
+multiverse.db-journal
+
+# OS & Editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
