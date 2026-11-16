@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import Optional, List, Dict, Any
 from pydantic import BaseModel
 
 class ProviderResponse(BaseModel):
@@ -10,6 +10,7 @@ class ProviderResponse(BaseModel):
     response_time_ms: Optional[float] = None
     status: str  # 'success', 'error', 'timeout'
     error_message: Optional[str] = None
+    search_results: Optional[List[Dict[str, Any]]] = None
 
 class BaseProvider(ABC):
     provider_name: str = "BaseProvider"

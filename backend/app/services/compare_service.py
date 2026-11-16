@@ -10,6 +10,7 @@ from app.database.models import Conversation, ComparisonTurn, ModelResponseRecor
 from app.providers.nvidia import nvidia_provider
 from app.providers.registry import model_registry
 from app.schemas.compare import ModelResult, CompareResponse
+from app.schemas.search import WebSearchResultItem
 from app.services.web_search_service import web_search_service
 
 class CompareService:
@@ -30,28 +31,14 @@ class CompareService:
         if not sanitized_model_ids:
             sanitized_model_ids = model_registry.get_default_model_ids()[:3]
 
-        # Check for web search need (either explicit toggle or intent detection)
-        search_intent_keywords = [
-            "ilan", "staj", "haber", "güncel", "son 3 ay", "son bir ay", "link ver",
-            "en son", "bugün", "fiyatı", "job", "internship", "hiring", "news"
-        ]
-        should_search = web_search or any(kw in prompt.lower() for kw in search_intent_keywords)
-
-        web_search_results = []
         effective_system_prompt = system_prompt or ""
+        if web_search:
+            effective_system_prompt = (
+                (effective_system_prompt + "\n\n" if effective_system_prompt else "") +
+                "Kullanıcı canlı internet aramasını talep etmiştir. Soruyu yanıtlarken güncel bilgi, ilan veya doküman gerekiyorsa web_search aracını aktif olarak kullanınız."
+            )
 
-        if should_search:
-            try:
-                web_search_results, grounding_context = await web_search_service.search(prompt, max_results=5)
-                if grounding_context:
-                    effective_system_prompt = (
-                        (effective_system_prompt + "\n\n" if effective_system_prompt else "") +
-                        grounding_context
-                    )
-            except Exception as e:
-                print("Web search failed gracefully:", e)
-
-        # Dispatch async tasks concurrently
+        # Dispatch async tasks concurrently - models autonomously decide if and what to search
         tasks = [
             nvidia_provider.generate(
                 model_id=mid,
@@ -67,6 +54,9 @@ class CompareService:
         raw_results = await asyncio.gather(*tasks, return_exceptions=True)
 
         results: List[ModelResult] = []
+        collected_web_items: List[WebSearchResultItem] = []
+        seen_links = set()
+
         for mid, outcome in zip(sanitized_model_ids, raw_results):
             model_info = model_registry.get(mid)
             model_name = model_info.name if model_info else mid
@@ -92,6 +82,17 @@ class CompareService:
                     status=outcome.status,
                     error_message=outcome.error_message
                 ))
+                # Aggregate search results discovered autonomously by models
+                if getattr(outcome, "search_results", None):
+                    for item in outcome.search_results:
+                        link = item.get("link", "").strip()
+                        if link and link not in seen_links:
+                            seen_links.add(link)
+                            collected_web_items.append(WebSearchResultItem(
+                                title=item.get("title", ""),
+                                link=link,
+                                snippet=item.get("snippet", "")
+                            ))
 
         # Persistence handling
         turn_id = str(uuid.uuid4())
@@ -155,7 +156,7 @@ class CompareService:
             successful_models=successful_count,
             failed_models=failed_count,
             attachments=attachments,
-            web_search_results=web_search_results if web_search_results else None
+            web_search_results=collected_web_items if collected_web_items else None
         )
 
     async def retry_single_model(

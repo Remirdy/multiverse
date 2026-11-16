@@ -1,10 +1,98 @@
 import time
+import json
 import asyncio
-from typing import Optional
+import urllib.parse
+from typing import Optional, List, Dict, Any, Tuple
+import requests
+from lxml import html
 from openai import AsyncOpenAI, APIError, AuthenticationError, RateLimitError
+from ddgs import DDGS
 from app.core.config import settings
 from app.providers.base import BaseProvider, ProviderResponse
 from app.providers.registry import model_registry
+
+AVAILABLE_TOOLS = [
+    {
+        "type": "function",
+        "function": {
+            "name": "web_search",
+            "description": "Searches the live internet for active job listings, internships, real-time facts, current news, official docs, or verified links. Call this whenever answering requires up-to-date or specific external web data.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "query": {
+                        "type": "string",
+                        "description": "Targeted search keywords (in English or Turkish) optimized to find relevant listings or pages."
+                    }
+                },
+                "required": ["query"]
+            }
+        }
+    }
+]
+
+def _clean_url(href: str) -> str:
+    if not href:
+        return ""
+    if "uddg=" in href:
+        try:
+            parsed = urllib.parse.parse_qs(urllib.parse.urlparse(href).query)
+            if "uddg" in parsed:
+                return parsed["uddg"][0]
+        except Exception:
+            pass
+    if href.startswith("//"):
+        return "https:" + href
+    return href
+
+def _sync_web_search(query: str, max_results: int = 5) -> Tuple[str, List[Dict[str, str]]]:
+    items: List[Dict[str, str]] = []
+    
+    # 1. Primary: Direct DDG HTML query (fast, bypasses bot challenges, returns direct job/career URLs)
+    try:
+        resp = requests.post(
+            "https://html.duckduckgo.com/html/",
+            data={"q": query},
+            headers={"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"},
+            timeout=6
+        )
+        if resp.status_code == 200:
+            tree = html.fromstring(resp.content)
+            for r in tree.xpath('//div[contains(@class, "result__body")]'):
+                title_elem = r.xpath('.//h2/a')
+                snippet_elem = r.xpath('.//a[contains(@class, "result__snippet")]')
+                if title_elem:
+                    title = "".join(title_elem[0].xpath('.//text()')).strip()
+                    href = _clean_url(title_elem[0].get("href", ""))
+                    snippet = "".join(snippet_elem[0].xpath('.//text()')).strip() if snippet_elem else ""
+                    if title and href and not href.startswith("https://duckduckgo.com"):
+                        items.append({"title": title, "link": href, "snippet": snippet})
+                        if len(items) >= max_results:
+                            break
+    except Exception as e:
+        print(f"[_sync_web_search HTML search error for '{query}']: {e}")
+
+    # 2. Fallback to ddgs library if HTML returned no results
+    if not items:
+        try:
+            with DDGS() as ddgs:
+                raw = list(ddgs.text(query, max_results=max_results))
+                for r in raw:
+                    t = r.get("title", "").strip()
+                    l = _clean_url(r.get("href", "").strip())
+                    s = r.get("body", "").strip()
+                    if t and l:
+                        items.append({"title": t, "link": l, "snippet": s})
+        except Exception as e:
+            print(f"[_sync_web_search ddgs fallback error for '{query}']: {e}")
+
+    if not items:
+        return "Canlı arama sonucu bulunamadı.", []
+
+    lines = []
+    for it in items:
+        lines.append(f"- **Başlık**: {it['title']}\n  **Link**: {it['link']}\n  **Özet**: {it['snippet']}")
+    return "\n\n".join(lines), items
 
 class NvidiaProvider(BaseProvider):
     provider_name: str = "NVIDIA NIM"
@@ -126,18 +214,70 @@ class NvidiaProvider(BaseProvider):
         start_time = time.perf_counter()
 
         try:
+            # Autonomous Tool Capability: models decide entirely on their own when to call web_search
+            tools_param = AVAILABLE_TOOLS if not is_vision else None
+            tool_choice_param = "auto" if not is_vision else None
+
             completion_coroutine = client.chat.completions.create(
                 model=model_id,
                 messages=messages,
                 temperature=0.7,
                 max_tokens=effective_max_tokens,
-                timeout=effective_timeout
+                timeout=effective_timeout,
+                tools=tools_param,
+                tool_choice=tool_choice_param
             )
             completion = await asyncio.wait_for(completion_coroutine, timeout=effective_timeout)
             
-            elapsed_ms = round((time.perf_counter() - start_time) * 1000, 2)
             msg = completion.choices[0].message
-            content = msg.content or getattr(msg, "reasoning_content", "") or ""
+
+            # Autonomous Tool Execution (ReAct Loop)
+            collected_search_items: List[Dict[str, str]] = []
+            if msg.tool_calls:
+                messages.append(msg)
+                for tc in msg.tool_calls:
+                    fn_name = tc.function.name
+                    if fn_name == "web_search":
+                        try:
+                            args = json.loads(tc.function.arguments)
+                            search_q = args.get("query", "")
+                        except Exception:
+                            search_q = str(tc.function.arguments)
+
+                        search_obs, items = await asyncio.to_thread(_sync_web_search, search_q, 6)
+                        if items:
+                            collected_search_items.extend(items)
+
+                        messages.append({
+                            "role": "tool",
+                            "tool_call_id": tc.id,
+                            "content": f"[Canlı Arama Sonuçları - '{search_q}']:\n{search_obs}"
+                        })
+
+                # Follow-up directive to ensure synthesis into grounded markdown response
+                messages.append({
+                    "role": "user",
+                    "content": "Canlı arama tamamlandı. Lütfen yukarıdaki arama sonuçlarında yer alan çalışan doğrudan bağlantıları ([Başlık](URL) biçiminde) ve gerçek pozisyonları kullanarak kullanıcının sorusuna doğrudan, eksiksiz ve profesyonel Türkçe nihai cevabını yaz."
+                })
+
+                # Second turn: Generate final response grounded in live web findings
+                second_coroutine = client.chat.completions.create(
+                    model=model_id,
+                    messages=messages,
+                    temperature=0.7,
+                    max_tokens=effective_max_tokens,
+                    timeout=effective_timeout
+                )
+                second_completion = await asyncio.wait_for(second_coroutine, timeout=effective_timeout)
+                final_msg = second_completion.choices[0].message
+                content = final_msg.content or getattr(final_msg, "reasoning_content", "") or ""
+                if "<tool_call>" in content:
+                    import re
+                    content = re.sub(r"<tool_call>[\s\S]*?</tool_call>", "", content).strip()
+            else:
+                content = msg.content or getattr(msg, "reasoning_content", "") or ""
+
+            elapsed_ms = round((time.perf_counter() - start_time) * 1000, 2)
 
             return ProviderResponse(
                 model_id=model_id,
@@ -146,7 +286,8 @@ class NvidiaProvider(BaseProvider):
                 response_text=content,
                 response_time_ms=elapsed_ms,
                 status="success",
-                error_message=None
+                error_message=None,
+                search_results=collected_search_items if collected_search_items else None
             )
 
         except asyncio.TimeoutError:
