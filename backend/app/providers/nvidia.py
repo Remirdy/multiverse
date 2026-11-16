@@ -116,24 +116,22 @@ class NvidiaProvider(BaseProvider):
                 system_prompt = (
                     "Sen NVIDIA Cosmos World Foundation Model (WFM) & Video Engine'sin (Google Gemini Omni 1.2 & Veo 2 muadili). "
                     "Fiziksel dünya simülasyonu, Navier-Stokes akışkanlar mekaniği, kinematik ve kesintisiz tek plan ARRI sinematografisinde uzmansın.\n"
-                    "Kullanıcının video prompt'unu analiz et ve eksiksiz olarak şu bölümleri oluştur:\n"
-                    "1. 🎬 **NVIDIA Cosmos WFM - Render Raporu & Çıktı Özeti**\n"
-                    "2. 📐 **Kamera & Optik Telemetri** (ARRI Alexa 35, 35mm Prime, 24 FPS, Shutter 180°, 9:16 Dikey, ISO 800)\n"
+                    "Kullanıcının video prompt'unu analiz et ve eksiksiz olarak şu profesyonel bölümleri oluştur:\n"
+                    "1. 🎬 **NVIDIA Cosmos WFM - Dünya Simülasyonu & Render Raporu**\n"
+                    "2. 📐 **Kamera & Optik Telemetri** (ARRI Alexa 35, 35mm Prime, 24 FPS, Shutter 180°, 9:16 Dikey, ISO 800, T1.8)\n"
                     "3. ⏱️ **Zaman Çizelgesi & Fiziksel Simülasyon Analizi (00:00 - 00:15)**: Her 3-4 saniyelik bloğun fizik motoru (su sıçraması, çay dökülme yerçekimi, el-bardak teması)\n"
-                    "4. 🎞️ **Cinematic Video Preview**: Yanıtının içine doğrudan şu oynatılabilir video etiketini göm:\n"
-                    '<video controls autoplay loop playsinline src="http://127.0.0.1:8000/static/istanbul_rain_arri35.mp4" class="w-full rounded-2xl border border-cyan-500/40 shadow-2xl my-3 max-h-[420px]"></video>\n'
+                    "4. 🎯 **Gerçek Video Difüzyon Prompt Seti (Wan 2.1 / Kling 1.5 / Runway Gen-3)**: Video DiT modellerinde piksel bazlı render almak için İngilizce optimize edilmiş tam komut seti ve negatif prompt matrisi.\n"
                     "5. 🛡️ **Kısıt ve Bükülme (Morphing) Doğrulaması**: Sıfır yapay doku, sıfır parmak hatası, gerçekçi cilt ve yağmur fiziği teyidi."
                 )
             elif "wan" in model_id.lower():
                 system_prompt = (
                     "Sen Wan 2.1 14B Cinema Engine'sin (VBench ~84.7% ile Sora & Veo 2 dünya lideri muadili). "
                     "3D Causal VAE mimarisi ile fotogerçekçi insan cildi, su/yağmur optik kırılması ve kesintisiz ARRI sinematografisinde uzmansın.\n"
-                    "Kullanıcının video prompt'unu analiz et ve eksiksiz olarak şu bölümleri oluştur:\n"
+                    "Kullanıcının video prompt'unu analiz et ve eksiksiz olarak şu profesyonel bölümleri oluştur:\n"
                     "1. 🎥 **Wan 2.1 14B - Sinematik Video Render Raporu**\n"
                     "2. 🎨 **Fotogerçekçi Doku & Işıklandırma Parametreleri** (3D Causal VAE, ARRI LogC4, Film Grain, Cilt Gözenekleri)\n"
                     "3. ⏱️ **Kesintisiz Çekim Akışı (00:00 - 00:15)**: Çay dökülme dinamikleri, şeffaf şemsiyedeki su kırılmaları ve hareket sürekliliği\n"
-                    "4. 🎞️ **Cinematic Video Preview**: Yanıtının içine doğrudan şu oynatılabilir video etiketini göm:\n"
-                    '<video controls autoplay loop playsinline src="http://127.0.0.1:8000/static/istanbul_rain_arri35.mp4" class="w-full rounded-2xl border border-cyan-500/40 shadow-2xl my-3 max-h-[420px]"></video>\n'
+                    "4. 🎯 **Wan 2.1 Doğrudan Difüzyon Komutu (DiT Prompt)**: ComfyUI ve Fal.ai / Replicate üzerinde doğrudan render edilebilir pozitif ve negatif prompt seti.\n"
                     "5. 🎯 **VBench Metrikleri & Kalite Analizi**: Temporal Coherence, Motion Smoothness, ve Estetik Kalite skorları."
                 )
 
@@ -171,14 +169,6 @@ class NvidiaProvider(BaseProvider):
             elapsed_ms = round((time.perf_counter() - start_time) * 1000, 2)
             msg = completion.choices[0].message
             content = msg.content or getattr(msg, "reasoning_content", "") or ""
-
-            # Ensure playable video preview tag is embedded for Video & World models
-            if is_video and "<video" not in content:
-                content += (
-                    "\n\n---\n\n"
-                    "### 🎞️ NVIDIA Cosmos WFM • 9:16 ARRI Sinematik Önizleme\n\n"
-                    '<video controls autoplay loop muted playsinline src="http://127.0.0.1:8000/static/istanbul_rain_arri35.mp4" class="w-full rounded-2xl border border-cyan-500/40 shadow-2xl my-3 max-h-[440px]"></video>\n'
-                )
 
             return ProviderResponse(
                 model_id=model_id,

@@ -5,7 +5,6 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
 import { CodeBlock } from './CodeBlock';
-import { CinemaPlayer } from './CinemaPlayer';
 
 interface MarkdownRendererProps {
   content: string;
@@ -93,12 +92,14 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) =
         components={{
           video({ node, ...props }: any) {
             return (
-              <CinemaPlayer
-                src={props.src}
-                title="NVIDIA Cosmos WFM • 9:16 ARRI Cinema Preview"
-                aspectRatio="9:16"
-                durationSeconds={15}
-              />
+              <div className="my-3 rounded-xl overflow-hidden border border-slate-800 bg-black/80">
+                <video
+                  {...props}
+                  controls
+                  playsInline
+                  className="w-full max-h-[440px] object-cover mx-auto"
+                />
+              </div>
             );
           },
           code({ inline, className, children, ...props }: any) {
