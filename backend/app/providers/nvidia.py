@@ -193,8 +193,18 @@ class NvidiaProvider(BaseProvider):
             )
 
         messages = []
-        if system_prompt:
-            messages.append({"role": "system", "content": system_prompt})
+        effective_sys = system_prompt
+        if image_attachments and is_vision:
+            vision_guidance = (
+                "Görseldeki tüm soruları, diyagramları, devre şemalarını ve bileşen değerlerini dikkatle incele. "
+                "İç karalamalarını veya İngilizce düşünce notlarını uzatmak yerine doğrudan kullanıcıya hitap ederek Türkçe dilinde, "
+                "soru soru (S-1, S-2...) adım adım analiz, uygulanan formüller (KVL, KCL, Ohm, Op-Amp vb.) ve net sayısal sonuçlarla "
+                "tertemiz, anlaşılır bir ödev/sınav çözümü sun."
+            )
+            effective_sys = f"{effective_sys}\n\n{vision_guidance}" if effective_sys else vision_guidance
+
+        if effective_sys:
+            messages.append({"role": "system", "content": effective_sys})
 
         if image_attachments and is_vision:
             content_blocks = [{"type": "text", "text": effective_prompt}]
