@@ -38,6 +38,12 @@ export interface ModelResult {
   error_message: string | null;
 }
 
+export interface WebSearchResultItem {
+  title: string;
+  link: string;
+  snippet: string;
+}
+
 export interface CompareRequest {
   prompt: string;
   model_ids: string[];
@@ -45,6 +51,7 @@ export interface CompareRequest {
   system_prompt?: string;
   timeout?: number;
   attachments?: AttachmentItem[];
+  web_search?: boolean;
 }
 
 export interface CompareResponse {
@@ -56,6 +63,7 @@ export interface CompareResponse {
   successful_models: number;
   failed_models: number;
   attachments?: AttachmentItem[];
+  web_search_results?: WebSearchResultItem[];
 }
 
 export interface RetryModelRequest {
@@ -75,6 +83,7 @@ export interface TurnDetail {
   created_at: string;
   responses: ModelResult[];
   attachments?: AttachmentItem[];
+  web_search_results?: WebSearchResultItem[];
 }
 
 export interface ConversationSummary {

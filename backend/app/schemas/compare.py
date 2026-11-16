@@ -1,5 +1,6 @@
 from typing import List, Optional
 from pydantic import BaseModel, Field
+from app.schemas.search import WebSearchResultItem
 
 class AttachmentItem(BaseModel):
     filename: str
@@ -19,6 +20,7 @@ class CompareRequest(BaseModel):
     system_prompt: Optional[str] = Field(None, description="Optional system instructions")
     timeout: Optional[float] = Field(None, description="Custom per-model timeout in seconds")
     attachments: Optional[List[AttachmentItem]] = Field(default=None, description="Uploaded files/images")
+    web_search: Optional[bool] = Field(default=False, description="Enable live internet search grounding")
 
 class ModelResult(BaseModel):
     model_id: str
@@ -38,6 +40,7 @@ class CompareResponse(BaseModel):
     successful_models: int
     failed_models: int
     attachments: Optional[List[AttachmentItem]] = None
+    web_search_results: Optional[List[WebSearchResultItem]] = None
 
 class RetryModelRequest(BaseModel):
     conversation_id: str
@@ -47,6 +50,7 @@ class RetryModelRequest(BaseModel):
     system_prompt: Optional[str] = None
     timeout: Optional[float] = None
     attachments: Optional[List[AttachmentItem]] = None
+    web_search: Optional[bool] = False
 
 class ModelResponseSummary(BaseModel):
     model_id: str

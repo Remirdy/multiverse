@@ -1,11 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Layers, Sparkles, SlidersHorizontal, Paperclip, FileText, Image as ImageIcon, X, Loader2, Wand2, RotateCcw } from 'lucide-react';
+import { Send, Layers, Sparkles, SlidersHorizontal, Paperclip, FileText, Image as ImageIcon, X, Loader2, Wand2, RotateCcw, Globe } from 'lucide-react';
 import { ModelInfo, AttachmentItem } from '../types';
 import { api } from '../services/api';
 import { useLanguage } from '../i18n/LanguageContext';
 
 interface ChatInputProps {
-  onSendMessage: (prompt: string, systemPrompt?: string, attachments?: AttachmentItem[]) => void;
+  onSendMessage: (prompt: string, systemPrompt?: string, attachments?: AttachmentItem[], webSearch?: boolean) => void;
   isLoading: boolean;
   selectedModels: ModelInfo[];
   onOpenModelSelector: () => void;
@@ -28,6 +28,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   const [systemPrompt, setSystemPrompt] = useState('');
   const [showSystemPrompt, setShowSystemPrompt] = useState(false);
   const [attachments, setAttachments] = useState<AttachmentItem[]>([]);
+  const [webSearchEnabled, setWebSearchEnabled] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [isEnhancing, setIsEnhancing] = useState(false);
@@ -147,7 +148,8 @@ export const ChatInput: React.FC<ChatInputProps> = ({
     onSendMessage(
       finalPrompt,
       systemPrompt.trim() ? systemPrompt.trim() : undefined,
-      attachments.length > 0 ? attachments : undefined
+      attachments.length > 0 ? attachments : undefined,
+      webSearchEnabled
     );
 
     setPrompt('');
@@ -352,6 +354,23 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           </div>
         )}
 
+        {/* Web Search Active Banner */}
+        {webSearchEnabled && (
+          <div className="flex items-center justify-between gap-2 px-3.5 py-1.5 bg-blue-950/60 border-b border-blue-800/40 text-[11px] text-blue-200 animate-fadeIn">
+            <div className="flex items-center gap-1.5 truncate">
+              <Globe className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+              <span>{t.webSearchActive}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setWebSearchEnabled(false)}
+              className="text-[10px] text-blue-400 hover:text-blue-200"
+            >
+              ✕
+            </button>
+          </div>
+        )}
+
         {/* Text Input Area & Action Buttons */}
         <div className="flex items-end gap-2 p-3">
           {/* File Upload Trigger Button */}
@@ -363,6 +382,20 @@ export const ChatInput: React.FC<ChatInputProps> = ({
             title="Belge veya devre fotoğrafı yükle (PDF, Resim, Kod, Metin)"
           >
             <Paperclip className="w-4 h-4" />
+          </button>
+
+          {/* Live Web Search Toggle Button */}
+          <button
+            type="button"
+            onClick={() => setWebSearchEnabled(!webSearchEnabled)}
+            className={`flex items-center justify-center w-10 h-10 rounded-xl border transition-all shrink-0 active:scale-95 ${
+              webSearchEnabled
+                ? 'bg-blue-600/90 text-white border-blue-400 shadow-md shadow-blue-950/50 ring-1 ring-blue-400/50'
+                : 'bg-space-850 hover:bg-space-800 text-slate-300 hover:text-blue-400 border-slate-700/60 hover:border-blue-500/50'
+            }`}
+            title={webSearchEnabled ? 'Canlı Web Arama Açık (Kapatmak için tıkla)' : 'Canlı Web Arama (Son ilanlar, haberler ve gerçek bağlantılar)'}
+          >
+            <Globe className="w-4 h-4" />
           </button>
 
           <textarea

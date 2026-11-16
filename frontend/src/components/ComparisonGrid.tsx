@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, Sparkles, FileText, Image as ImageIcon, Trophy, Loader2 } from 'lucide-react';
+import { User, Sparkles, FileText, Image as ImageIcon, Trophy, Loader2, Globe, ExternalLink } from 'lucide-react';
 import { TurnDetail, ModelResult } from '../types';
 import { ComparisonCard } from './ComparisonCard';
 import { ArbiterCard } from './ArbiterCard';
@@ -126,6 +126,31 @@ export const ComparisonGrid: React.FC<ComparisonGridProps> = ({
                     </div>
                   )}
                 </div>
+
+                {/* Live Web Grounding Sources Bar */}
+                {turn.web_search_results && turn.web_search_results.length > 0 && (
+                  <div className="p-3 rounded-2xl bg-blue-950/40 border border-blue-800/40 text-xs text-blue-200 space-y-2 animate-fadeIn">
+                    <div className="flex items-center gap-1.5 font-semibold text-blue-300">
+                      <Globe className="w-3.5 h-3.5 text-blue-400" />
+                      <span>{t.webSourcesTitle} ({turn.web_search_results.length}):</span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {turn.web_search_results.map((src, sIdx) => (
+                        <a
+                          key={sIdx}
+                          href={src.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-900/40 hover:bg-blue-800/60 border border-blue-700/50 text-[11px] text-blue-200 hover:text-white transition-colors"
+                          title={src.snippet}
+                        >
+                          <ExternalLink className="w-3 h-3 text-blue-400 shrink-0" />
+                          <span className="truncate max-w-[220px]">{src.title}</span>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 

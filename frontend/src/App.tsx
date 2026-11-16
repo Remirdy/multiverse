@@ -164,7 +164,7 @@ export const App: React.FC = () => {
   );
 
   // Send message for multi-model comparison
-  const handleSendMessage = async (prompt: string, systemPrompt?: string, attachments?: any[]) => {
+  const handleSendMessage = async (prompt: string, systemPrompt?: string, attachments?: any[], webSearch?: boolean) => {
     // Check if attachments contains visual graphics (photos, schematics, rendered PDF pages)
     const hasVisualAttachments = attachments?.some(
       (it) => it.file_type === 'image' || (it.page_images && it.page_images.length > 0)
@@ -228,6 +228,7 @@ export const App: React.FC = () => {
         conversation_id: activeConversationId || undefined,
         system_prompt: systemPrompt,
         attachments: attachments || undefined,
+        web_search: webSearch,
       });
 
       // Update turn with actual results
@@ -238,6 +239,7 @@ export const App: React.FC = () => {
         created_at: new Date().toISOString(),
         responses: response.results,
         attachments: attachments || undefined,
+        web_search_results: response.web_search_results,
       };
 
       setTurns((prev) =>

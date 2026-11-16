@@ -54,6 +54,9 @@ export const translations = {
     enhancingPrompt: 'Güçlendiriliyor...',
     enhancedNotice: '✨ Prompt NVIDIA AI ile güçlendirildi',
     undoEnhance: 'Geri Al',
+    webSearchToggle: 'Canlı Web Arama',
+    webSearchActive: '🌐 Canlı Web Arama Aktif: En güncel ilanlar ve gerçek zamanlı web kaynakları taranıyor.',
+    webSourcesTitle: 'İncelenen Canlı Web Kaynakları',
     footerInfo: 'NVIDIA Build NIM Çoklu Model Altyapısı',
 
     // Comparison Card & Grid
@@ -143,6 +146,9 @@ export const translations = {
     enhancingPrompt: 'Enhancing...',
     enhancedNotice: '✨ Prompt enhanced with NVIDIA AI',
     undoEnhance: 'Undo',
+    webSearchToggle: 'Live Web Search',
+    webSearchActive: '🌐 Live Web Search Active: Grounding with real-time web results and active postings.',
+    webSourcesTitle: 'Live Web Sources Grounded',
     footerInfo: 'NVIDIA Build NIM Multi-Model Engine',
 
     // Comparison Card & Grid

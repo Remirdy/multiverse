@@ -10,6 +10,7 @@ from app.database.models import Conversation, ComparisonTurn, ModelResponseRecor
 from app.providers.nvidia import nvidia_provider
 from app.providers.registry import model_registry
 from app.schemas.compare import ModelResult, CompareResponse
+from app.services.web_search_service import web_search_service
 
 class CompareService:
     async def compare_models(
@@ -20,6 +21,7 @@ class CompareService:
         system_prompt: Optional[str] = None,
         timeout: Optional[float] = None,
         attachments: Optional[list] = None,
+        web_search: bool = False,
         db: Optional[AsyncSession] = None
     ) -> CompareResponse:
         # Enforce timeout & model limits
@@ -28,12 +30,33 @@ class CompareService:
         if not sanitized_model_ids:
             sanitized_model_ids = model_registry.get_default_model_ids()[:3]
 
+        # Check for web search need (either explicit toggle or intent detection)
+        search_intent_keywords = [
+            "ilan", "staj", "haber", "güncel", "son 3 ay", "son bir ay", "link ver",
+            "en son", "bugün", "fiyatı", "job", "internship", "hiring", "news"
+        ]
+        should_search = web_search or any(kw in prompt.lower() for kw in search_intent_keywords)
+
+        web_search_results = []
+        effective_system_prompt = system_prompt or ""
+
+        if should_search:
+            try:
+                web_search_results, grounding_context = await web_search_service.search(prompt, max_results=5)
+                if grounding_context:
+                    effective_system_prompt = (
+                        (effective_system_prompt + "\n\n" if effective_system_prompt else "") +
+                        grounding_context
+                    )
+            except Exception as e:
+                print("Web search failed gracefully:", e)
+
         # Dispatch async tasks concurrently
         tasks = [
             nvidia_provider.generate(
                 model_id=mid,
                 prompt=prompt,
-                system_prompt=system_prompt,
+                system_prompt=effective_system_prompt if effective_system_prompt.strip() else None,
                 timeout=effective_timeout,
                 attachments=attachments
             )
@@ -131,7 +154,8 @@ class CompareService:
             total_models=len(results),
             successful_models=successful_count,
             failed_models=failed_count,
-            attachments=attachments
+            attachments=attachments,
+            web_search_results=web_search_results if web_search_results else None
         )
 
     async def retry_single_model(

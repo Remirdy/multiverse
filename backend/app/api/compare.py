@@ -33,6 +33,7 @@ async def compare_prompt(
         system_prompt=request.system_prompt,
         timeout=request.timeout,
         attachments=request.attachments,
+        web_search=request.web_search or False,
         db=db
     )
 
