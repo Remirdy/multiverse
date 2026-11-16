@@ -1,5 +1,5 @@
 import React from 'react';
-import { User, Sparkles } from 'lucide-react';
+import { User, Sparkles, FileText, Image as ImageIcon } from 'lucide-react';
 import { TurnDetail } from '../types';
 import { ComparisonCard } from './ComparisonCard';
 
@@ -34,13 +34,44 @@ export const ComparisonGrid: React.FC<ComparisonGridProps> = ({
               <div className="w-8 h-8 rounded-xl bg-space-800 border border-slate-700/80 flex items-center justify-center text-slate-300 shrink-0 mt-0.5">
                 <User className="w-4 h-4" />
               </div>
-              <div className="flex-1 space-y-1">
+              <div className="flex-1 space-y-2">
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-semibold text-slate-300">You</span>
                   <span className="text-[10px] text-slate-500 font-mono">
                     {turn.created_at ? new Date(turn.created_at).toLocaleTimeString() : 'Just now'}
                   </span>
                 </div>
+
+                {/* Attachments Display in User Bubble */}
+                {turn.attachments && turn.attachments.length > 0 && (
+                  <div className="flex flex-wrap gap-2.5 pt-1">
+                    {turn.attachments.map((att, attIdx) => (
+                      <div
+                        key={attIdx}
+                        className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-space-900 border border-slate-700/80 text-xs shadow-sm max-w-sm"
+                      >
+                        {att.file_type === 'image' && att.data_url ? (
+                          <div className="w-8 h-8 rounded-lg overflow-hidden bg-space-950 border border-slate-700 shrink-0">
+                            <img src={att.data_url} alt={att.filename} className="w-full h-full object-cover" />
+                          </div>
+                        ) : att.file_type === 'image' ? (
+                          <ImageIcon className="w-4 h-4 text-emerald-400 shrink-0" />
+                        ) : (
+                          <FileText className="w-4 h-4 text-cyan-400 shrink-0" />
+                        )}
+                        <div className="flex flex-col truncate">
+                          <span className="truncate font-medium text-slate-200 text-xs" title={att.filename}>
+                            {att.filename}
+                          </span>
+                          <span className="text-[10px] text-slate-400">
+                            {formatBytes(att.size)} {att.page_count ? `• ${att.page_count} sayfa` : ''}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
                 <div className="p-3.5 rounded-2xl rounded-tl-sm bg-space-850/80 border border-slate-800/80 text-sm text-slate-100 leading-relaxed shadow-sm">
                   {turn.prompt}
                   {turn.system_prompt && (
@@ -88,3 +119,10 @@ export const ComparisonGrid: React.FC<ComparisonGridProps> = ({
     </div>
   );
 };
+
+function formatBytes(bytes: number): string {
+  if (!bytes) return '0 B';
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}

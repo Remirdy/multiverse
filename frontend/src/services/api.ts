@@ -7,7 +7,8 @@ import {
   ConversationSummary,
   ConversationDetail,
   RouteResponse,
-  ProviderHealth
+  ProviderHealth,
+  AttachmentItem
 } from '../types';
 
 const BASE_URL = '/api';
@@ -35,6 +36,28 @@ class ApiClient {
 
     if (res.status === 204) {
       return null as unknown as T;
+    }
+
+    return res.json();
+  }
+
+  // Upload
+  async uploadFile(file: File): Promise<AttachmentItem> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const res = await fetch(`${BASE_URL}/upload`, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!res.ok) {
+      let err = 'Dosya yükleme başarısız oldu';
+      try {
+        const j = await res.json();
+        err = j.detail || err;
+      } catch {}
+      throw new Error(err);
     }
 
     return res.json();

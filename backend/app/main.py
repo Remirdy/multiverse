@@ -8,6 +8,7 @@ from app.api.models import router as models_router
 from app.api.compare import router as compare_router
 from app.api.conversations import router as conversations_router
 from app.api.router import router as router_router
+from app.api.upload import router as upload_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -36,6 +37,7 @@ app.include_router(models_router, prefix=settings.API_V1_PREFIX)
 app.include_router(compare_router, prefix=settings.API_V1_PREFIX)
 app.include_router(conversations_router, prefix=settings.API_V1_PREFIX)
 app.include_router(router_router, prefix=settings.API_V1_PREFIX)
+app.include_router(upload_router, prefix=settings.API_V1_PREFIX)
 
 @app.get("/")
 async def root():

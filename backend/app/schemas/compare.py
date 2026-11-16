@@ -1,12 +1,22 @@
 from typing import List, Optional
 from pydantic import BaseModel, Field
 
+class AttachmentItem(BaseModel):
+    filename: str
+    content_type: str
+    file_type: str  # "image" or "document"
+    size: int
+    data_url: Optional[str] = None  # for images
+    extracted_text: Optional[str] = None  # for documents
+    preview: Optional[str] = None
+
 class CompareRequest(BaseModel):
     prompt: str = Field(..., min_length=1, description="User prompt to compare across models")
     model_ids: List[str] = Field(..., min_length=1, description="List of model IDs to query")
     conversation_id: Optional[str] = Field(None, description="Optional conversation UUID to associate with")
     system_prompt: Optional[str] = Field(None, description="Optional system instructions")
     timeout: Optional[float] = Field(None, description="Custom per-model timeout in seconds")
+    attachments: Optional[List[AttachmentItem]] = Field(default=None, description="Uploaded files/images")
 
 class ModelResult(BaseModel):
     model_id: str
@@ -25,6 +35,7 @@ class CompareResponse(BaseModel):
     total_models: int
     successful_models: int
     failed_models: int
+    attachments: Optional[List[AttachmentItem]] = None
 
 class RetryModelRequest(BaseModel):
     conversation_id: str
@@ -33,3 +44,4 @@ class RetryModelRequest(BaseModel):
     prompt: str
     system_prompt: Optional[str] = None
     timeout: Optional[float] = None
+    attachments: Optional[List[AttachmentItem]] = None

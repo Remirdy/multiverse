@@ -36,7 +36,8 @@ class NvidiaProvider(BaseProvider):
         model_id: str,
         prompt: str,
         system_prompt: Optional[str] = None,
-        timeout: float = 45.0
+        timeout: float = 45.0,
+        attachments: Optional[list] = None
     ) -> ProviderResponse:
         model_info = model_registry.get(model_id)
         model_name = model_info.name if model_info else model_id
@@ -54,10 +55,49 @@ class NvidiaProvider(BaseProvider):
                 error_message="NVIDIA API Key not configured. Please set NVIDIA_API_KEY in backend/.env."
             )
 
+        # Process attachments
+        doc_parts = []
+        image_attachments = []
+        if attachments:
+            for item in attachments:
+                # Support Pydantic model or dict
+                ftype = getattr(item, "file_type", None) or (item.get("file_type") if isinstance(item, dict) else "")
+                fname = getattr(item, "filename", None) or (item.get("filename") if isinstance(item, dict) else "Attachment")
+                text = getattr(item, "extracted_text", None) or (item.get("extracted_text") if isinstance(item, dict) else "")
+                durl = getattr(item, "data_url", None) or (item.get("data_url") if isinstance(item, dict) else "")
+
+                if ftype == "image" or durl:
+                    image_attachments.append({"filename": fname, "data_url": durl})
+                elif text:
+                    doc_parts.append(f"📄 **[Ekli Belge: {fname}]**\n```\n{text[:35000]}\n```")
+
+        doc_context = ("\n\n".join(doc_parts) + "\n\n---\n") if doc_parts else ""
+        effective_prompt = f"{doc_context}{prompt}" if doc_context else prompt
+
+        # Determine if this model is vision-capable
+        is_vision = "vl" in model_id.lower() or "vision" in model_id.lower() or (
+            model_info is not None and any(t in ["vision", "multimodal"] for t in model_info.tags)
+        )
+
         messages = []
         if system_prompt:
             messages.append({"role": "system", "content": system_prompt})
-        messages.append({"role": "user", "content": prompt})
+
+        if image_attachments:
+            if is_vision:
+                content_blocks = [{"type": "text", "text": effective_prompt}]
+                for img in image_attachments:
+                    content_blocks.append({
+                        "type": "image_url",
+                        "image_url": {"url": img["data_url"]}
+                    })
+                messages.append({"role": "user", "content": content_blocks})
+            else:
+                img_names = ", ".join([img["filename"] for img in image_attachments])
+                note = f"ℹ️ *[Kullanıcı {img_names} görselini ekledi. Bu model metin tabanlı olduğu için sadece soru metnini ve ekli belgeleri değerlendirmektedir]*\n\n"
+                messages.append({"role": "user", "content": note + effective_prompt})
+        else:
+            messages.append({"role": "user", "content": effective_prompt})
 
         start_time = time.perf_counter()
 

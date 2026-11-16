@@ -164,7 +164,7 @@ export const App: React.FC = () => {
   );
 
   // Send message for multi-model comparison
-  const handleSendMessage = async (prompt: string, systemPrompt?: string) => {
+  const handleSendMessage = async (prompt: string, systemPrompt?: string, attachments?: any[]) => {
     // If auto route enabled and we have recommended models, apply them
     let activeModelIds = selectedModelIds;
     if (isAutoRouteEnabled && routeInfo && routeInfo.recommended_model_ids.length > 0) {
@@ -192,6 +192,7 @@ export const App: React.FC = () => {
       system_prompt: systemPrompt || null,
       created_at: new Date().toISOString(),
       responses: loadingResults,
+      attachments: attachments || undefined,
     };
 
     setTurns((prev) => [...prev, optimisticTurn]);
@@ -204,6 +205,7 @@ export const App: React.FC = () => {
         model_ids: activeModelIds,
         conversation_id: activeConversationId || undefined,
         system_prompt: systemPrompt,
+        attachments: attachments || undefined,
       });
 
       // Update turn with actual results
@@ -213,6 +215,7 @@ export const App: React.FC = () => {
         system_prompt: systemPrompt || null,
         created_at: new Date().toISOString(),
         responses: response.results,
+        attachments: attachments || undefined,
       };
 
       setTurns((prev) =>

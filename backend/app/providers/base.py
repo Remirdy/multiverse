@@ -20,9 +20,10 @@ class BaseProvider(ABC):
         model_id: str,
         prompt: str,
         system_prompt: Optional[str] = None,
-        timeout: float = 45.0
+        timeout: float = 45.0,
+        attachments: Optional[list] = None
     ) -> ProviderResponse:
-        """Generate response from a specific model with independent timeout"""
+        """Generate response from a specific model with independent timeout and optional attachments"""
         pass
 
     @abstractmethod

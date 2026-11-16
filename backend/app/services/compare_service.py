@@ -19,6 +19,7 @@ class CompareService:
         conversation_id: Optional[str] = None,
         system_prompt: Optional[str] = None,
         timeout: Optional[float] = None,
+        attachments: Optional[list] = None,
         db: Optional[AsyncSession] = None
     ) -> CompareResponse:
         # Enforce timeout & model limits
@@ -33,7 +34,8 @@ class CompareService:
                 model_id=mid,
                 prompt=prompt,
                 system_prompt=system_prompt,
-                timeout=effective_timeout
+                timeout=effective_timeout,
+                attachments=attachments
             )
             for mid in sanitized_model_ids
         ]
@@ -128,7 +130,8 @@ class CompareService:
             results=results,
             total_models=len(results),
             successful_models=successful_count,
-            failed_models=failed_count
+            failed_models=failed_count,
+            attachments=attachments
         )
 
     async def retry_single_model(
@@ -139,6 +142,7 @@ class CompareService:
         prompt: str,
         system_prompt: Optional[str] = None,
         timeout: Optional[float] = None,
+        attachments: Optional[list] = None,
         db: Optional[AsyncSession] = None
     ) -> ModelResult:
         effective_timeout = timeout or settings.DEFAULT_TIMEOUT_SECONDS
@@ -146,7 +150,8 @@ class CompareService:
             model_id=model_id,
             prompt=prompt,
             system_prompt=system_prompt,
-            timeout=effective_timeout
+            timeout=effective_timeout,
+            attachments=attachments
         )
 
         model_info = model_registry.get(model_id)

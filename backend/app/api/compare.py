@@ -28,6 +28,7 @@ async def compare_prompt(
         conversation_id=request.conversation_id,
         system_prompt=request.system_prompt,
         timeout=request.timeout,
+        attachments=request.attachments,
         db=db
     )
 
@@ -46,5 +47,6 @@ async def retry_model(
         prompt=request.prompt,
         system_prompt=request.system_prompt,
         timeout=request.timeout,
+        attachments=request.attachments,
         db=db
     )

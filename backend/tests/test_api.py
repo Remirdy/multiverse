@@ -82,3 +82,29 @@ async def test_compare_prompt():
         res = data["results"][0]
         assert res["model_id"] == "poolside/laguna-xs-2.1"
         assert res["status"] in ["success", "timeout", "error"]
+
+@pytest.mark.asyncio
+async def test_upload_file_text():
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        files = {"file": ("test.py", b"def hello(): return 'world'", "text/x-python")}
+        res = await client.post("/api/upload", files=files)
+        assert res.status_code == 200
+        data = res.json()
+        assert data["filename"] == "test.py"
+        assert data["file_type"] == "document"
+        assert "def hello" in data["extracted_text"]
+
+@pytest.mark.asyncio
+async def test_upload_file_image():
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        # 1x1 transparent PNG bytes
+        png_bytes = b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06\x00\x00\x00\x1f\x15c4\x00\x00\x00\nIDATx\x9cc\x00\x01\x00\x00\x05\x00\x01\r\n-\xb4\x00\x00\x00\x00IEND\xaeB`\x82"
+        files = {"file": ("chart.png", png_bytes, "image/png")}
+        res = await client.post("/api/upload", files=files)
+        assert res.status_code == 200
+        data = res.json()
+        assert data["filename"] == "chart.png"
+        assert data["file_type"] == "image"
+        assert data["data_url"].startswith("data:image/png;base64,")

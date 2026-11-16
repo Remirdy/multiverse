@@ -16,6 +16,17 @@ export interface ModelListResponse {
   total: number;
 }
 
+export interface AttachmentItem {
+  filename: string;
+  content_type: string;
+  file_type: 'image' | 'document';
+  size: number;
+  data_url?: string;
+  extracted_text?: string;
+  preview?: string;
+  page_count?: number;
+}
+
 export interface ModelResult {
   model_id: string;
   model_name: string;
@@ -32,6 +43,7 @@ export interface CompareRequest {
   conversation_id?: string;
   system_prompt?: string;
   timeout?: number;
+  attachments?: AttachmentItem[];
 }
 
 export interface CompareResponse {
@@ -42,6 +54,7 @@ export interface CompareResponse {
   total_models: number;
   successful_models: number;
   failed_models: number;
+  attachments?: AttachmentItem[];
 }
 
 export interface RetryModelRequest {
@@ -51,6 +64,7 @@ export interface RetryModelRequest {
   prompt: string;
   system_prompt?: string;
   timeout?: number;
+  attachments?: AttachmentItem[];
 }
 
 export interface TurnDetail {
@@ -59,6 +73,7 @@ export interface TurnDetail {
   system_prompt?: string | null;
   created_at: string;
   responses: ModelResult[];
+  attachments?: AttachmentItem[];
 }
 
 export interface ConversationSummary {
