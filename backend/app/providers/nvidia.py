@@ -119,6 +119,10 @@ class NvidiaProvider(BaseProvider):
         else:
             messages.append({"role": "user", "content": effective_prompt})
 
+        # Generous limits for multi-problem visual exam and schematic solving
+        effective_max_tokens = 4096 if is_vision else 3072
+        effective_timeout = max(timeout or 90.0, 120.0) if is_vision else (timeout or 90.0)
+
         start_time = time.perf_counter()
 
         try:
@@ -126,10 +130,10 @@ class NvidiaProvider(BaseProvider):
                 model=model_id,
                 messages=messages,
                 temperature=0.7,
-                max_tokens=2048,
-                timeout=timeout
+                max_tokens=effective_max_tokens,
+                timeout=effective_timeout
             )
-            completion = await asyncio.wait_for(completion_coroutine, timeout=timeout)
+            completion = await asyncio.wait_for(completion_coroutine, timeout=effective_timeout)
             
             elapsed_ms = round((time.perf_counter() - start_time) * 1000, 2)
             msg = completion.choices[0].message
@@ -154,7 +158,7 @@ class NvidiaProvider(BaseProvider):
                 response_text=None,
                 response_time_ms=elapsed_ms,
                 status="timeout",
-                error_message=f"Model response timed out after {timeout} seconds."
+                error_message=f"Model response timed out after {effective_timeout} seconds."
             )
 
         except AuthenticationError:

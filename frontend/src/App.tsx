@@ -165,9 +165,31 @@ export const App: React.FC = () => {
 
   // Send message for multi-model comparison
   const handleSendMessage = async (prompt: string, systemPrompt?: string, attachments?: any[]) => {
-    // If auto route enabled and we have recommended models, apply them
+    // Check if attachments contains visual graphics (photos, schematics, rendered PDF pages)
+    const hasVisualAttachments = attachments?.some(
+      (it) => it.file_type === 'image' || (it.page_images && it.page_images.length > 0)
+    );
+
     let activeModelIds = selectedModelIds;
-    if (isAutoRouteEnabled && routeInfo && routeInfo.recommended_model_ids.length > 0) {
+
+    // Strict Vision Enforcement: If visual schematics or images are attached,
+    // exclusively route to Vision-capable models so text-only models do not hallucinate or apologize
+    if (hasVisualAttachments) {
+      const visionModelIds = models
+        .filter((m) => m.id.includes('vl') || m.id.includes('vision') || m.tags.includes('vision'))
+        .map((m) => m.id);
+
+      const filteredVision = activeModelIds.filter((mid) => visionModelIds.includes(mid));
+      if (filteredVision.length > 0) {
+        activeModelIds = filteredVision;
+      } else {
+        activeModelIds = visionModelIds.length > 0 ? visionModelIds : [
+          'nvidia/nemotron-3.5-super-vl-120b-a12b',
+          'meta/llama-3.2-90b-vision-instruct'
+        ];
+      }
+      setSelectedModelIds(activeModelIds);
+    } else if (isAutoRouteEnabled && routeInfo && routeInfo.recommended_model_ids.length > 0) {
       activeModelIds = routeInfo.recommended_model_ids;
       setSelectedModelIds(activeModelIds);
     }

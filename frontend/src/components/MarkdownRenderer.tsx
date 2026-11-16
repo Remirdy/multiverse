@@ -22,30 +22,31 @@ interface MarkdownRendererProps {
 function preprocessLaTeX(content: string): string {
   if (!content) return '';
 
-  // 1. Convert \[ ... \] to $$ ... $$
-  let text = content.replace(/\\\[([\s\S]*?)\\\]/g, (_, math) => `\n\n$$\n${math.trim()}\n$$\n\n`);
+  let text = content;
 
-  // 2. Convert \( ... \) to $ ... $
+  // 1. Convert standard LaTeX display math \[ ... \] to $$ ... $$
+  text = text.replace(/\\\[([\s\S]*?)\\\]/g, (_, math) => `\n\n$$\n${math.trim()}\n$$\n\n`);
+
+  // 2. Convert standard LaTeX inline math \( ... \) to $ ... $
   text = text.replace(/\\\(([\s\S]*?)\\\)/g, (_, math) => `$${math.trim()}$`);
 
-  // 3. Convert bracketed math expressions like [ U = \begin{pmatrix} ... \end{pmatrix} ... ]
+  // 3. Convert square-bracketed display math like [ U = \begin{pmatrix} ... \end{pmatrix} ]
+  // or [ \lambda_1 = 3, \lambda_2 = 1 ] or [ x = \frac{a}{b} ] (excluding markdown links [text](url))
   text = text.replace(
-    /\[\s*([a-zA-Z0-9_+\-*=^/\{\}\s\.,&\\()]*?\\begin\{(?:pmatrix|matrix|bmatrix|vmatrix|Vmatrix|cases|aligned|align|gather)\}[\s\S]*?\\end\{(?:pmatrix|matrix|bmatrix|vmatrix|Vmatrix|cases|aligned|align|gather)\}[\s\S]*?)\s*\]/g,
+    /(?:^|(?<=[^\w\\]))\[\s*([^[\]\n]*?(?:\\begin|\\frac|\\sqrt|\\pmatrix|\\matrix|\\bmatrix|\\vmatrix|\\quad|\\alpha|\\beta|\\gamma|\\lambda|\\theta|\\pi|\\sum|\\int|\\partial|\\cdot|\\times|\\pm|\\mp|\\in|\\subset|\\mathbf|\\mathbb|\\det|\\sin|\\cos|\\tan)[\s\S]*?)\s*\](?!\()/g,
     (_, math) => `\n\n$$\n${math.trim()}\n$$\n\n`
   );
 
-  // 4. Wrap any naked \begin{pmatrix} ... \end{pmatrix} not already inside $$
+  // 4. Wrap any naked \begin{matrix/pmatrix/cases...} not already enclosed in $$
   text = text.replace(
     /(?<!\$\$[\s\S]*?)(\\begin\{(?:pmatrix|matrix|bmatrix|vmatrix|Vmatrix|cases|aligned|align|gather)\}[\s\S]*?\\end\{(?:pmatrix|matrix|bmatrix|vmatrix|Vmatrix|cases|aligned|align|gather)\})/g,
     (match) => `\n\n$$\n${match.trim()}\n$$\n\n`
   );
 
-  // 5. Fix single backslash row separators inside matrix blocks: "\ " -> "\\ "
+  // 5. Fix single backslash row separators inside matrix blocks to double backslashes
   text = text.replace(
     /(\\begin\{(?:pmatrix|matrix|bmatrix|vmatrix|Vmatrix)\}[\s\S]*?\\end\{(?:pmatrix|matrix|bmatrix|vmatrix|Vmatrix)\})/g,
-    (match) => {
-      return match.replace(/\\\s+(?=\\frac|[-0-9a-zA-Z\\])/g, '\\\\ ');
-    }
+    (match) => match.replace(/\\\s+(?=\\frac|[-0-9a-zA-Z\\])/g, '\\\\ ')
   );
 
   // 6. Wrap raw electronics & math symbols outside $...$ in math tags
@@ -59,18 +60,22 @@ function preprocessLaTeX(content: string): string {
   // 7. Fix ?=I2 query tags from circuit labelings
   text = text.replace(/\?=(I[0-9a-zA-Z_]+|V[0-9a-zA-Z_]+)/g, '($1 = ?)');
 
-  // 8. Fix unclosed dollar sign on individual lines (e.g. "• $D_1$ is ON. $V_{cathode_D1} =")
+  // 8. Fix unclosed dollar signs across lines or at the end of cut-off responses
   const lines = text.split('\n');
   const fixedLines = lines.map((line) => {
-    // Count unescaped dollar signs
     const matches = line.match(/(?<!\\)\$/g);
     if (matches && matches.length % 2 !== 0) {
-      // Append closing $ at end of line so KaTeX tokenization succeeds
       return line.trimEnd() + '$';
     }
     return line;
   });
   text = fixedLines.join('\n');
+
+  // If entire text has odd number of dollar signs, append closing dollar
+  const globalDollarMatches = text.match(/(?<!\\)\$/g);
+  if (globalDollarMatches && globalDollarMatches.length % 2 !== 0) {
+    text = text.trimEnd() + '$';
+  }
 
   return text;
 }
