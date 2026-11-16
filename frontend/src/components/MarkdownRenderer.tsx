@@ -5,6 +5,7 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
 import { CodeBlock } from './CodeBlock';
+import { CinemaPlayer } from './CinemaPlayer';
 
 interface MarkdownRendererProps {
   content: string;
@@ -92,21 +93,12 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) =
         components={{
           video({ node, ...props }: any) {
             return (
-              <div className="my-4 rounded-2xl overflow-hidden border border-cyan-500/40 shadow-[0_0_35px_rgba(6,182,212,0.15)] bg-black/90">
-                <div className="flex items-center justify-between px-4 py-2 bg-space-950/90 border-b border-slate-800 text-xs">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span className="font-semibold text-cyan-300">NVIDIA Cosmos WFM • 9:16 ARRI Cinema Preview</span>
-                  </div>
-                  <span className="text-[11px] text-slate-400 font-mono">1080×1920 • 24 FPS • Single Take</span>
-                </div>
-                <video
-                  {...props}
-                  controls
-                  playsInline
-                  className="w-full max-h-[460px] object-cover mx-auto"
-                />
-              </div>
+              <CinemaPlayer
+                src={props.src}
+                title="NVIDIA Cosmos WFM • 9:16 ARRI Cinema Preview"
+                aspectRatio="9:16"
+                durationSeconds={15}
+              />
             );
           },
           code({ inline, className, children, ...props }: any) {
