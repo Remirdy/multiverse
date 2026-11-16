@@ -86,23 +86,36 @@ class NvidiaProvider(BaseProvider):
             model_info is not None and any(t in ["vision", "multimodal"] for t in model_info.tags)
         )
 
+        # If user attached visual images / circuit drawings, but this model cannot see them,
+        # return a clear, immediate notice rather than letting the text model hallucinate or apologize.
+        if image_attachments and not is_vision:
+            img_names = ", ".join([img["filename"] for img in image_attachments[:2]])
+            return ProviderResponse(
+                model_id=model_id,
+                model_name=model_name,
+                provider=provider_name,
+                response_text=(
+                    f"⚠️ **Görsel / Şema Uyarısı ({model_name})**\n\n"
+                    f"Bu model **saf metin ve kod** odaklıdır; yüklediğiniz görsel veya devre şemasını ({img_names}) doğrudan algılayamaz. Tahmin yürüterek uydurma devre formülleri üretmesi ve yanıltıcı değerler vermesi engellenmiştir.\n\n"
+                    f"👉 **Doğru Çözüm İçin:** Devre şemalarını ve çizimleri piksel düzeyinde inceleyen **Nemotron Super VL 120B** veya **Llama 3.2 90B Vision** modelini kullanınız."
+                ),
+                response_time_ms=5.0,
+                status="success",
+                error_message=None
+            )
+
         messages = []
         if system_prompt:
             messages.append({"role": "system", "content": system_prompt})
 
-        if image_attachments:
-            if is_vision:
-                content_blocks = [{"type": "text", "text": effective_prompt}]
-                for img in image_attachments[:5]:  # send up to 5 visual diagrams/pages
-                    content_blocks.append({
-                        "type": "image_url",
-                        "image_url": {"url": img["data_url"]}
-                    })
-                messages.append({"role": "user", "content": content_blocks})
-            else:
-                img_names = ", ".join([img["filename"] for img in image_attachments[:3]])
-                note = f"ℹ️ *[Kullanıcı {img_names} devre şeması/görseli ekledi. Bu model saf metin tabanlı olduğu için devre çizimlerini görememektedir; görsel şemaların çözümü için 'Nemotron Super VL 120B (Görsel & Devre)' modelini seçmelisiniz]*\n\n"
-                messages.append({"role": "user", "content": note + effective_prompt})
+        if image_attachments and is_vision:
+            content_blocks = [{"type": "text", "text": effective_prompt}]
+            for img in image_attachments[:5]:  # send up to 5 visual diagrams/pages
+                content_blocks.append({
+                    "type": "image_url",
+                    "image_url": {"url": img["data_url"]}
+                })
+            messages.append({"role": "user", "content": content_blocks})
         else:
             messages.append({"role": "user", "content": effective_prompt})
 

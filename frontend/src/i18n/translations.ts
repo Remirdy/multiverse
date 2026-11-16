@@ -47,6 +47,9 @@ export const translations = {
     uploadingHint: 'Belge ve şemalar ayrıştırılıyor...',
     visionRecommend: 'Devre şeması veya çizimleri incelemek için Görsel (Vision) modeli önerilir:',
     addVisionModel: '+ Nemotron Super VL Ekle',
+    visionModeActive: '👁️ Görsel Algılama Modu: Devre şemaları ve fotoğraflar için Vision modelleri (Nemotron Super VL & Llama 3.2 Vision) otomatik seçildi.',
+    visionOnlyTab: '👁️ Görsel & Şema (Vision)',
+    allModelsTab: 'Tüm Modeller',
     footerInfo: 'NVIDIA Build NIM Çoklu Model Altyapısı',
 
     // Comparison Card & Grid
@@ -123,6 +126,9 @@ export const translations = {
     uploadingHint: 'Parsing document & schematics...',
     visionRecommend: 'Nemotron Super VL 120B (Vision Model) is recommended to analyze circuit diagrams:',
     addVisionModel: '+ Add Nemotron Super VL',
+    visionModeActive: '👁️ Vision Mode Active: Vision models (Nemotron Super VL & Llama 3.2 Vision) auto-selected for circuit schematics & photos.',
+    visionOnlyTab: '👁️ Vision & Schematics',
+    allModelsTab: 'All Models',
     footerInfo: 'NVIDIA Build NIM Multi-Model Engine',
 
     // Comparison Card & Grid

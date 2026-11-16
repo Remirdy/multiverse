@@ -67,12 +67,23 @@ class ModelRegistry:
                 id="nvidia/nemotron-3.5-super-vl-120b-a12b",
                 name="Nemotron Super VL 120B",
                 provider="NVIDIA NIM",
-                description="4-Argon muadili. 120B çok modlu kapasite; robotik kinematiği, ROS sistemleri, PID kontrol ve donanım CAD mühendisliği.",
-                category="Robotik & Sistem (4-Argon Muadili)",
+                description="4-Argon muadili. 120B çok modlu kapasite; devre şemaları, robotik kinematiği, ROS sistemleri, PID kontrol ve teknik çizimler.",
+                category="Görsel & Devre Şeması (4-Argon Vision)",
                 context_length=128000,
                 is_available=True,
                 is_default=False,
-                tags=["robotics", "argon-tier", "engineering"]
+                tags=["vision", "multimodal", "robotics", "argon-tier", "engineering"]
+            ),
+            ModelInfo(
+                id="meta/llama-3.2-90b-vision-instruct",
+                name="Llama 3.2 90B Vision",
+                provider="NVIDIA NIM",
+                description="Meta'nın en gelişmiş 90 Milyar parametreli multimodal görsel modeli; devreler, grafikler, optik karakterler ve teknik şemalar.",
+                category="Görsel & Multimodal (Llama 3.2 Vision)",
+                context_length=128000,
+                is_available=True,
+                is_default=False,
+                tags=["vision", "multimodal", "llama-tier"]
             ),
             ModelInfo(
                 id="nvidia/riva-translate-4b-instruct-v2",

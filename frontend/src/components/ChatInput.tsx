@@ -11,6 +11,7 @@ interface ChatInputProps {
   onOpenModelSelector: () => void;
   onPromptChange?: (prompt: string) => void;
   onAddVisionModel?: () => void;
+  onAutoSelectVisionModels?: () => void;
 }
 
 export const ChatInput: React.FC<ChatInputProps> = ({
@@ -20,6 +21,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   onOpenModelSelector,
   onPromptChange,
   onAddVisionModel,
+  onAutoSelectVisionModels,
 }) => {
   const { t } = useLanguage();
   const [prompt, setPrompt] = useState('');
@@ -55,6 +57,14 @@ export const ChatInput: React.FC<ChatInputProps> = ({
       const uploadPromises = Array.from(files).map((f) => api.uploadFile(f));
       const uploadedItems = await Promise.all(uploadPromises);
       setAttachments((prev) => [...prev, ...uploadedItems]);
+
+      // Automatically switch to Vision models when image or schematic PDF is detected
+      const hasVisual = uploadedItems.some(
+        (it) => it.file_type === 'image' || (it.page_images && it.page_images.length > 0)
+      );
+      if (hasVisual && onAutoSelectVisionModels) {
+        onAutoSelectVisionModels();
+      }
     } catch (err: any) {
       alert(`Dosya yüklenirken hata oluştu: ${err.message}`);
     } finally {
@@ -202,6 +212,16 @@ export const ChatInput: React.FC<ChatInputProps> = ({
             </button>
           </div>
         </div>
+
+        {/* Vision Mode Active Indicator */}
+        {attachments.some((a) => a.file_type === 'image' || (a.page_images && a.page_images.length > 0)) && (
+          <div className="flex items-center justify-between gap-2 px-3.5 py-1.5 bg-emerald-950/60 border-b border-emerald-800/50 text-[11px] text-emerald-300 animate-fadeIn">
+            <div className="flex items-center gap-1.5 truncate">
+              <Sparkles className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+              <span className="truncate">{t.visionModeActive}</span>
+            </div>
+          </div>
+        )}
 
         {/* Vision Model Recommendation Banner for Schematics/Diagrams */}
         {attachments.length > 0 && !selectedModels.some((m) => m.id.includes('vl') || m.id.includes('vision')) && (

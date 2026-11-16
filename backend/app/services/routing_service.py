@@ -3,6 +3,20 @@ from typing import Dict, List
 from app.schemas.router import RouteResponse
 
 CATEGORY_CONFIG = {
+    "vision_circuit": {
+        "label": "Görsel & Devre Şeması Analizi (Vision Modelleri)",
+        "keywords": [
+            "görsel", "görselde", "devre", "şema", "şeması", "resim", "fotoğraf", "çizim", "diyagram",
+            "diyot", "transistör", "şekil", "şekildeki", "circuit", "diagram", "schematic", "diode",
+            "transistor", "voltage", "current", "resistor", "image", "photo", "pdf", "direnç", "akım", "gerilim", "zener"
+        ],
+        "regex": [r"\b(?:Vo|Vin|Vout|Vcc|Vee|GND|I[1-9]|V[1-9]|I_[a-zA-Z0-9]+|V_[a-zA-Z0-9]+)\b", r"\bgörsel\w*\b", r"\bşema\w*\b", r"\bdevre\w*\b"],
+        "recommended_models": [
+            "nvidia/nemotron-3.5-super-vl-120b-a12b",
+            "meta/llama-3.2-90b-vision-instruct"
+        ],
+        "description": "Devre şemalarını ve çizimleri piksel düzeyinde inceleyen Vision modelleri (Nemotron Super VL & Llama 3.2 Vision) hedeflendi."
+    },
     "programming": {
         "label": "Yazılım & Kod Geliştirme (Claude Sonnet Muadili)",
         "keywords": [

@@ -301,6 +301,15 @@ export const App: React.FC = () => {
     selectedModelIds.includes(m.id)
   );
 
+  const handleAutoSelectVisionModels = () => {
+    const visionModels = models.filter(
+      (m) => m.id.includes('vl') || m.id.includes('vision') || m.tags.includes('vision')
+    );
+    if (visionModels.length > 0) {
+      setSelectedModelIds(visionModels.map((m) => m.id));
+    }
+  };
+
   const handleAddVisionModel = () => {
     const visionModel = models.find(
       (m) => m.id.includes('vl') || m.id.includes('vision') || m.tags.includes('vision')
@@ -374,6 +383,7 @@ export const App: React.FC = () => {
           onOpenModelSelector={() => setIsModelSelectorOpen(true)}
           onPromptChange={handlePromptChange}
           onAddVisionModel={handleAddVisionModel}
+          onAutoSelectVisionModels={handleAutoSelectVisionModels}
         />
       </div>
 
