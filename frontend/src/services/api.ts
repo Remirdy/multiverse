@@ -87,6 +87,17 @@ class ApiClient {
     });
   }
 
+  async synthesize(data: {
+    prompt: string;
+    responses: Array<{ model_id: string; model_name: string; response_text: string }>;
+    language?: string;
+  }): Promise<{ arbiter_model: string; synthesis_text: string; latency_ms: number }> {
+    return this.request('/compare/synthesize', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
   // Conversations
   async getConversations(): Promise<ConversationSummary[]> {
     return this.request<ConversationSummary[]>('/conversations');

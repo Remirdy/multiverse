@@ -1,7 +1,9 @@
-import React from 'react';
-import { User, Sparkles, FileText, Image as ImageIcon } from 'lucide-react';
-import { TurnDetail } from '../types';
+import React, { useState } from 'react';
+import { User, Sparkles, FileText, Image as ImageIcon, Trophy, Loader2 } from 'lucide-react';
+import { TurnDetail, ModelResult } from '../types';
 import { ComparisonCard } from './ComparisonCard';
+import { ArbiterCard } from './ArbiterCard';
+import { api } from '../services/api';
 import { useLanguage } from '../i18n/LanguageContext';
 
 interface ComparisonGridProps {
@@ -15,7 +17,49 @@ export const ComparisonGrid: React.FC<ComparisonGridProps> = ({
   onRetryModel,
   retryingModelKeys,
 }) => {
-  const { t } = useLanguage();
+  const { language, t } = useLanguage();
+  const [syntheses, setSyntheses] = useState<Record<string, { arbiter_model: string; synthesis_text: string; latency_ms: number }>>({});
+  const [synthesizingTurns, setSynthesizingTurns] = useState<Set<string>>(new Set());
+
+  const handleSynthesize = async (turnId: string, prompt: string, responses: ModelResult[]) => {
+    setSynthesizingTurns((prev) => new Set(prev).add(turnId));
+
+    try {
+      const payload = {
+        prompt,
+        responses: responses.map((r) => ({
+          model_id: r.model_id,
+          model_name: r.model_name,
+          response_text: r.response_text || '',
+        })),
+        language,
+      };
+      const res = await api.synthesize(payload);
+      if (res && res.synthesis_text) {
+        setSyntheses((prev) => ({
+          ...prev,
+          [turnId]: res,
+        }));
+      }
+    } catch (err: any) {
+      alert(`Sentezleme sırasında hata oluştu: ${err.message}`);
+    } finally {
+      setSynthesizingTurns((prev) => {
+        const next = new Set(prev);
+        next.delete(turnId);
+        return next;
+      });
+    }
+  };
+
+  const handleCloseSynthesis = (turnId: string) => {
+    setSyntheses((prev) => {
+      const next = { ...prev };
+      delete next[turnId];
+      return next;
+    });
+  };
+
   const getGridColsClass = (count: number) => {
     if (count === 1) return 'grid-cols-1 max-w-2xl mx-auto';
     if (count === 2) return 'grid-cols-1 lg:grid-cols-2';
@@ -85,12 +129,62 @@ export const ComparisonGrid: React.FC<ComparisonGridProps> = ({
               </div>
             </div>
 
-            {/* Model Comparison Grid */}
-            <div className="pl-0 sm:pl-11 space-y-2">
-              <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
-                <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-                <span>{t.perspectives} ({turn.responses.length})</span>
-              </div>
+            {/* Model Comparison Grid Header & Arbiter Mode */}
+            <div className="pl-0 sm:pl-11 space-y-4">
+              {/* Arbiter Action Bar */}
+              {(() => {
+                const successful = turn.responses.filter((r) => r.status === 'success' && r.response_text);
+                const isLoadingModels = turn.responses.some((r) => r.status === 'loading');
+                const isTurnSynthesizing = synthesizingTurns.has(turn.id);
+                const currentSynthesis = syntheses[turn.id];
+
+                return (
+                  <>
+                    <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl bg-space-850/80 border border-slate-800 text-xs">
+                      <div className="flex items-center gap-2 font-semibold text-slate-300">
+                        <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+                        <span>{t.perspectives} ({turn.responses.length})</span>
+                      </div>
+
+                      {successful.length >= 2 && !isLoadingModels && (
+                        <button
+                          type="button"
+                          onClick={() => handleSynthesize(turn.id, turn.prompt, successful)}
+                          disabled={isTurnSynthesizing}
+                          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all shadow-md active:scale-95 ${
+                            isTurnSynthesizing
+                              ? 'bg-amber-950/80 text-amber-300 border border-amber-600/60 animate-pulse cursor-wait'
+                              : 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-space-950 shadow-amber-950/40'
+                          }`}
+                          title="NVIDIA Nemotron Ultra 550B ile modellerin güçlü yönlerini sentezle"
+                        >
+                          {isTurnSynthesizing ? (
+                            <>
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                              <span>{t.synthesizing}</span>
+                            </>
+                          ) : (
+                            <>
+                              <Trophy className="w-3.5 h-3.5 stroke-[2.5]" />
+                              <span>{t.synthesizeBtn}</span>
+                            </>
+                          )}
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Render Golden Synthesis Card if available */}
+                    {currentSynthesis && (
+                      <ArbiterCard
+                        arbiterModel={currentSynthesis.arbiter_model}
+                        synthesisText={currentSynthesis.synthesis_text}
+                        latencyMs={currentSynthesis.latency_ms}
+                        onClose={() => handleCloseSynthesis(turn.id)}
+                      />
+                    )}
+                  </>
+                );
+              })()}
 
               <div className={`grid gap-4 ${gridClass}`}>
                 {turn.responses.map((modelResult) => {

@@ -58,6 +58,12 @@ export const translations = {
 
     // Comparison Card & Grid
     perspectives: 'Eşzamanlı Model Karşılaştırması',
+    synthesizeBtn: '🏆 Modelleri Sentezle (NVIDIA 550B Hakem)',
+    synthesizing: 'Nemotron-3 Ultra 550B yanıtları inceliyor & sentezliyor...',
+    arbiterTitle: '🏆 550B Hakem Kararı & Altın Sentez',
+    arbiterSubtitle: 'NVIDIA Nemotron-3 Ultra 550B tarafından tarafsız olarak sentezlendi',
+    arbiterLatency: 'Sentez Süresi',
+    closeArbiter: 'Kapat',
     copy: 'Kopyala',
     copied: 'Kopyalandı!',
     retry: 'Yeniden Dene',
@@ -141,6 +147,12 @@ export const translations = {
 
     // Comparison Card & Grid
     perspectives: 'Simultaneous Model Comparison',
+    synthesizeBtn: '🏆 Synthesize Best (NVIDIA 550B Arbiter)',
+    synthesizing: 'Nemotron-3 Ultra 550B analyzing & synthesizing models...',
+    arbiterTitle: '🏆 550B Arbiter Decision & Golden Synthesis',
+    arbiterSubtitle: 'Neutrally evaluated & synthesized by NVIDIA Nemotron-3 Ultra 550B',
+    arbiterLatency: 'Synthesis Latency',
+    closeArbiter: 'Close',
     copy: 'Copy',
     copied: 'Copied!',
     retry: 'Retry',

@@ -2,8 +2,12 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.session import get_db
-from app.schemas.compare import CompareRequest, CompareResponse, RetryModelRequest, ModelResult
+from app.schemas.compare import (
+    CompareRequest, CompareResponse, RetryModelRequest, ModelResult,
+    SynthesizeRequest, SynthesizeResponse
+)
 from app.services.compare_service import compare_service
+from app.services.synthesis_service import synthesis_service
 
 router = APIRouter(prefix="/compare", tags=["Comparison"])
 
@@ -49,4 +53,19 @@ async def retry_model(
         timeout=request.timeout,
         attachments=request.attachments,
         db=db
+    )
+
+@router.post("/synthesize", response_model=SynthesizeResponse)
+async def synthesize_turn(request: SynthesizeRequest):
+    """
+    Arbiter Consensus Synthesis:
+    Uses NVIDIA Nemotron-3 Ultra 550B to evaluate multiple model responses,
+    highlight edge-case differences, and synthesize a single golden master solution.
+    """
+    if not request.responses:
+        raise HTTPException(status_code=400, detail="At least one response is required for synthesis")
+    return await synthesis_service.synthesize(
+        prompt=request.prompt,
+        responses=request.responses,
+        language=request.language or "tr"
     )

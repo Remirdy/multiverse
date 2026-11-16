@@ -114,3 +114,9 @@ export interface EnhancePromptResponse {
   latency_ms: number;
   model_used: string;
 }
+
+export interface SynthesizeResponse {
+  arbiter_model: string;
+  synthesis_text: string;
+  latency_ms: number;
+}

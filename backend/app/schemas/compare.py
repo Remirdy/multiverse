@@ -47,3 +47,18 @@ class RetryModelRequest(BaseModel):
     system_prompt: Optional[str] = None
     timeout: Optional[float] = None
     attachments: Optional[List[AttachmentItem]] = None
+
+class ModelResponseSummary(BaseModel):
+    model_id: str
+    model_name: str
+    response_text: str
+
+class SynthesizeRequest(BaseModel):
+    prompt: str
+    responses: List[ModelResponseSummary]
+    language: Optional[str] = "tr"
+
+class SynthesizeResponse(BaseModel):
+    arbiter_model: str
+    synthesis_text: str
+    latency_ms: float
