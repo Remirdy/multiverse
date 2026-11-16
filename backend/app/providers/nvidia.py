@@ -214,9 +214,9 @@ class NvidiaProvider(BaseProvider):
         start_time = time.perf_counter()
 
         try:
-            # Autonomous Tool Capability: models decide entirely on their own when to call web_search
-            tools_param = AVAILABLE_TOOLS if not is_vision else None
-            tool_choice_param = "auto" if not is_vision else None
+            # Autonomous Tool Capability: all models autonomously decide when to call web_search
+            tools_param = AVAILABLE_TOOLS
+            tool_choice_param = "auto"
 
             completion_coroutine = client.chat.completions.create(
                 model=model_id,
@@ -271,11 +271,47 @@ class NvidiaProvider(BaseProvider):
                 second_completion = await asyncio.wait_for(second_coroutine, timeout=effective_timeout)
                 final_msg = second_completion.choices[0].message
                 content = final_msg.content or getattr(final_msg, "reasoning_content", "") or ""
-                if "<tool_call>" in content:
-                    import re
-                    content = re.sub(r"<tool_call>[\s\S]*?</tool_call>", "", content).strip()
+            elif msg.content and "<tool_call>" in msg.content:
+                # Some models (like Nemotron text variants) occasionally format tool calls directly as XML in message content
+                import re
+                qm = re.search(r"<parameter=query>([\s\S]*?)</parameter>", msg.content)
+                if not qm:
+                    qm = re.search(r'query["\']?\s*:\s*["\']([^"\']+)["\']', msg.content)
+                search_q = qm.group(1).strip() if qm else prompt[:60]
+
+                search_obs, items = await asyncio.to_thread(_sync_web_search, search_q, 6)
+                if items:
+                    collected_search_items.extend(items)
+
+                messages.append({"role": "assistant", "content": f"Arama yapılıyor: {search_q}"})
+                messages.append({
+                    "role": "user",
+                    "content": f"[Canlı Arama Sonuçları - '{search_q}']:\n{search_obs}\n\nCanlı arama tamamlandı. Lütfen yukarıdaki arama sonuçlarında yer alan çalışan doğrudan bağlantıları ([Başlık](URL) biçiminde) ve gerçek pozisyonları kullanarak kullanıcının sorusuna doğrudan, eksiksiz ve profesyonel Türkçe nihai cevabını yaz."
+                })
+
+                second_coroutine = client.chat.completions.create(
+                    model=model_id,
+                    messages=messages,
+                    temperature=0.7,
+                    max_tokens=effective_max_tokens,
+                    timeout=effective_timeout
+                )
+                second_completion = await asyncio.wait_for(second_coroutine, timeout=effective_timeout)
+                final_msg = second_completion.choices[0].message
+                content = final_msg.content or getattr(final_msg, "reasoning_content", "") or ""
             else:
                 content = msg.content or getattr(msg, "reasoning_content", "") or ""
+
+            # Ensure no stray internal tool tags leak into user-facing output
+            if "<tool_call>" in content or "<function=" in content:
+                import re
+                content = re.sub(r"<tool_call>[\s\S]*?</tool_call>", "", content)
+                content = re.sub(r"<tool_call>", "", content)
+                content = re.sub(r"</tool_call>", "", content)
+                content = re.sub(r"<function=[\w_]+>", "", content)
+                content = re.sub(r"</function>", "", content)
+                content = re.sub(r"<parameter=[\w_]+>", "", content)
+                content = re.sub(r"</parameter>", "", content).strip()
 
             elapsed_ms = round((time.perf_counter() - start_time) * 1000, 2)
 
