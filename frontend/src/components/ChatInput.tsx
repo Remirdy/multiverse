@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, Layers, Sparkles, SlidersHorizontal, Paperclip, FileText, Image as ImageIcon, X, Loader2 } from 'lucide-react';
 import { ModelInfo, AttachmentItem } from '../types';
 import { api } from '../services/api';
+import { useLanguage } from '../i18n/LanguageContext';
 
 interface ChatInputProps {
   onSendMessage: (prompt: string, systemPrompt?: string, attachments?: AttachmentItem[]) => void;
@@ -20,6 +21,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   onPromptChange,
   onAddVisionModel,
 }) => {
+  const { t } = useLanguage();
   const [prompt, setPrompt] = useState('');
   const [systemPrompt, setSystemPrompt] = useState('');
   const [showSystemPrompt, setShowSystemPrompt] = useState(false);
@@ -87,9 +89,9 @@ export const ChatInput: React.FC<ChatInputProps> = ({
     
     // Fallback prompt if user only uploads document/image without text
     const finalPrompt = prompt.trim() || (
-      attachments.some((a) => a.file_type === 'image')
-        ? 'Bu görseli detaylı olarak analiz et, içeriği ve önemli ayrıntıları açıkla.'
-        : 'Bu ekli belgeyi incele, özetle ve önemli noktalarını çıkar.'
+      attachments.some((a) => a.file_type === 'image' || (a.page_images && a.page_images.length > 0))
+        ? (t.langLabel === 'TR' ? 'Analyze this circuit schematic and calculate output voltage Vo and currents.' : 'Bu devre şemasını ve görseli analiz et, Vo gerilimini ve akımları hesapla.')
+        : (t.langLabel === 'TR' ? 'Analyze and summarize the attached document.' : 'Bu ekli belgeyi incele, özetle ve önemli noktalarını çıkar.')
     );
 
     onSendMessage(
@@ -129,21 +131,21 @@ export const ChatInput: React.FC<ChatInputProps> = ({
         <div className="mb-2 p-2.5 rounded-xl bg-space-900 border border-slate-800 shadow-md">
           <div className="flex items-center justify-between mb-1.5 px-1">
             <span className="text-[11px] font-medium text-slate-400">
-              System Instructions (Optional)
+              {t.systemToggle}
             </span>
             <button
               type="button"
               onClick={() => setShowSystemPrompt(false)}
               className="text-[10px] text-slate-500 hover:text-slate-300"
             >
-              Hide
+              ✕
             </button>
           </div>
           <input
             type="text"
             value={systemPrompt}
             onChange={(e) => setSystemPrompt(e.target.value)}
-            placeholder="e.g. You are a senior engineer. Provide concise code examples and benchmarks."
+            placeholder={t.systemPlaceholder}
             className="w-full bg-space-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500/60"
           />
         </div>
@@ -167,7 +169,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
         {/* Model Chips Bar */}
         <div className="flex items-center justify-between gap-2 px-3.5 py-2 border-b border-slate-800/60 bg-space-850/40 text-xs">
           <div className="flex items-center gap-1.5 overflow-x-auto custom-scrollbar py-0.5">
-            <span className="text-slate-500 text-[11px] font-medium shrink-0">Models ({selectedModels.length}):</span>
+            <span className="text-slate-500 text-[11px] font-medium shrink-0">{t.modelsLabel} ({selectedModels.length}):</span>
             {selectedModels.map((m) => (
               <span
                 key={m.id}
@@ -184,10 +186,10 @@ export const ChatInput: React.FC<ChatInputProps> = ({
               type="button"
               onClick={() => setShowSystemPrompt(!showSystemPrompt)}
               className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-slate-200 px-2 py-1 rounded hover:bg-space-800 transition-colors"
-              title="Toggle system prompt instructions"
+              title={t.systemToggle}
             >
               <SlidersHorizontal className="w-3 h-3" />
-              <span className="hidden sm:inline">System</span>
+              <span className="hidden sm:inline">{t.systemBtn}</span>
             </button>
 
             <button
@@ -196,7 +198,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
               className="flex items-center gap-1 text-[11px] font-medium text-cyan-400 hover:text-cyan-300 px-2.5 py-1 rounded-lg bg-cyan-950/60 border border-cyan-800/60 hover:bg-cyan-900/40 transition-colors"
             >
               <Layers className="w-3 h-3" />
-              <span>Change</span>
+              <span>{t.changeModels}</span>
             </button>
           </div>
         </div>
@@ -206,7 +208,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           <div className="flex items-center justify-between gap-2 px-3.5 py-1.5 bg-cyan-950/40 border-b border-cyan-800/40 text-[11px] text-cyan-200">
             <div className="flex items-center gap-1.5 truncate">
               <Sparkles className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-              <span className="truncate">Devre şeması veya çizimleri incelemek için <strong>Nemotron Super VL 120B (Görsel Model)</strong> önerilir.</span>
+              <span className="truncate">{t.visionRecommend}</span>
             </div>
             {onAddVisionModel && (
               <button
@@ -214,7 +216,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
                 onClick={onAddVisionModel}
                 className="px-2 py-0.5 rounded bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-400/40 text-cyan-300 font-medium text-[10px] shrink-0 transition-colors"
               >
-                + Modeli Ekle
+                {t.addVisionModel}
               </button>
             )}
           </div>
@@ -228,7 +230,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
                 key={idx}
                 className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-space-800 border border-slate-700/80 text-xs text-slate-200 group animate-fadeIn"
               >
-                {att.file_type === 'image' ? (
+                {att.file_type === 'image' || (att.page_images && att.page_images.length > 0) ? (
                   <div className="w-6 h-6 rounded overflow-hidden bg-space-900 border border-slate-700 shrink-0 flex items-center justify-center">
                     {att.data_url ? (
                       <img src={att.data_url} alt={att.filename} className="w-full h-full object-cover" />
@@ -261,7 +263,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
             {isUploading && (
               <div className="flex items-center gap-1.5 text-xs text-cyan-400 px-2 py-1 rounded bg-cyan-950/40 border border-cyan-800/50 animate-pulse">
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                <span>Belge yükleniyor ve ayrıştırılıyor...</span>
+                <span>{t.uploadingHint}</span>
               </div>
             )}
           </div>
@@ -275,7 +277,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
             onClick={() => fileInputRef.current?.click()}
             disabled={isLoading || isUploading}
             className="flex items-center justify-center w-10 h-10 rounded-xl bg-space-850 hover:bg-space-800 text-slate-300 hover:text-cyan-400 border border-slate-700/60 hover:border-cyan-500/50 transition-all shrink-0 active:scale-95 disabled:opacity-50"
-            title="Belge veya fotoğraf yükle (PDF, Resim, Kod, Metin)"
+            title="Belge veya devre fotoğrafı yükle (PDF, Resim, Kod, Metin)"
           >
             <Paperclip className="w-4 h-4" />
           </button>
@@ -287,8 +289,8 @@ export const ChatInput: React.FC<ChatInputProps> = ({
             onKeyDown={handleKeyDown}
             placeholder={
               attachments.length > 0
-                ? "Eklenen belgeler hakkında ne sormak istersiniz? (Enter'a basarak gönderin)..."
-                : "Bir soru sorun veya fotoğraf/belge yükleyin (PDF, Görsel, Python, JSON)..."
+                ? t.inputPlaceholderDocs
+                : t.inputPlaceholder
             }
             rows={1}
             disabled={isLoading}
@@ -303,7 +305,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
                 ? 'bg-space-800 text-slate-600 cursor-not-allowed border border-slate-700/40'
                 : 'bg-cyan-500 hover:bg-cyan-400 text-space-950 shadow-md shadow-cyan-950/40 active:scale-95'
             }`}
-            title="Modellere gönder (Enter)"
+            title={t.sendBtn}
           >
             <Send className="w-4 h-4 stroke-[2.5]" />
           </button>
@@ -311,8 +313,8 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 
         {/* Footnote */}
         <div className="flex items-center justify-between px-3.5 pb-2 text-[10px] text-slate-500">
-          <span>Fotoğraf, PDF veya kod dosyalarını sürükleyip bırakabilirsiniz</span>
-          <span>NVIDIA Build NIM Çoklu Model Altyapısı</span>
+          <span>{t.dropHint}</span>
+          <span>{t.footerInfo}</span>
         </div>
       </form>
     </div>

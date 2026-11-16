@@ -2,6 +2,7 @@ import React from 'react';
 import { User, Sparkles, FileText, Image as ImageIcon } from 'lucide-react';
 import { TurnDetail } from '../types';
 import { ComparisonCard } from './ComparisonCard';
+import { useLanguage } from '../i18n/LanguageContext';
 
 interface ComparisonGridProps {
   turns: TurnDetail[];
@@ -14,6 +15,7 @@ export const ComparisonGrid: React.FC<ComparisonGridProps> = ({
   onRetryModel,
   retryingModelKeys,
 }) => {
+  const { t } = useLanguage();
   const getGridColsClass = (count: number) => {
     if (count === 1) return 'grid-cols-1 max-w-2xl mx-auto';
     if (count === 2) return 'grid-cols-1 lg:grid-cols-2';
@@ -87,7 +89,7 @@ export const ComparisonGrid: React.FC<ComparisonGridProps> = ({
             <div className="pl-0 sm:pl-11 space-y-2">
               <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
                 <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-                <span>Simultaneous Model Comparison ({turn.responses.length} Perspectives)</span>
+                <span>{t.perspectives} ({turn.responses.length})</span>
               </div>
 
               <div className={`grid gap-4 ${gridClass}`}>

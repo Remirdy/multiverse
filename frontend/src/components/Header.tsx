@@ -1,7 +1,8 @@
 import React from 'react';
-import { Menu, Layers, ShieldCheck, ShieldAlert } from 'lucide-react';
+import { Menu, Layers, ShieldCheck, ShieldAlert, Globe } from 'lucide-react';
 import { ModelInfo, ProviderHealth } from '../types';
 import { Logo } from './Logo';
+import { useLanguage } from '../i18n/LanguageContext';
 
 interface HeaderProps {
   onToggleSidebar: () => void;
@@ -20,6 +21,7 @@ export const Header: React.FC<HeaderProps> = ({
   health,
   onOpenKeyModal,
 }) => {
+  const { toggleLanguage, t } = useLanguage();
   const isKeyConfigured = health?.api_key_set ?? false;
 
   return (
@@ -38,12 +40,22 @@ export const Header: React.FC<HeaderProps> = ({
             <Logo size={24} />
           </div>
           <span className="font-semibold text-sm text-slate-200 truncate">
-            {activeConversationTitle || 'New Comparison'}
+            {activeConversationTitle || t.newComparison}
           </span>
         </div>
       </div>
 
-      <div className="flex items-center gap-2.5">
+      <div className="flex items-center gap-2 sm:gap-2.5">
+        {/* Language Toggle Button */}
+        <button
+          onClick={toggleLanguage}
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-space-850 hover:bg-space-800 border border-slate-700/60 text-xs font-semibold text-slate-300 hover:text-cyan-400 transition-all shadow-sm"
+          title={t.changeLanguage}
+        >
+          <Globe className="w-3.5 h-3.5 text-cyan-400" />
+          <span className="font-mono tracking-wider">{t.langLabel}</span>
+        </button>
+
         {/* Model Selection Pill */}
         <button
           onClick={onOpenModelSelector}
@@ -51,7 +63,7 @@ export const Header: React.FC<HeaderProps> = ({
           title="Manage comparison models"
         >
           <Layers className="w-3.5 h-3.5 text-cyan-400" />
-          <span>{selectedModels.length} Models Active</span>
+          <span>{selectedModels.length} {t.modelsActive}</span>
         </button>
 
         {/* NVIDIA API Health / Key status button */}
@@ -67,12 +79,12 @@ export const Header: React.FC<HeaderProps> = ({
           {isKeyConfigured ? (
             <>
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-              <span className="hidden md:inline">NVIDIA Live</span>
+              <span className="hidden md:inline">{t.nvidiaLive}</span>
             </>
           ) : (
             <>
               <ShieldAlert className="w-3.5 h-3.5 text-amber-400" />
-              <span className="hidden md:inline">API Key Needed</span>
+              <span className="hidden md:inline">{t.noApiKey}</span>
             </>
           )}
         </button>

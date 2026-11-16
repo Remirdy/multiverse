@@ -10,11 +10,13 @@ interface MarkdownRendererProps {
 }
 
 /**
- * Preprocesses LaTeX equations produced by LLMs to ensure standard KaTeX parsing:
+ * Preprocesses LaTeX equations and formatting produced by LLMs to ensure standard KaTeX parsing:
  * - Normalizes \[ ... \] to $$ ... $$ (display math)
  * - Normalizes \( ... \) to $ ... $ (inline math)
  * - Converts raw bracketed matrix environments [ U = \begin{pmatrix} ... \end{pmatrix} ] to $$ ... $$
  * - Wraps naked LaTeX environments in $$ ... $$
+ * - Fixes naked symbols like \to, \Omega, \approx outside math tags
+ * - Fixes unclosed single dollar signs ($) on individual lines
  * - Fixes single-backslash row breaks in matrices to \\
  */
 function preprocessLaTeX(content: string): string {
@@ -46,6 +48,30 @@ function preprocessLaTeX(content: string): string {
     }
   );
 
+  // 6. Wrap raw electronics & math symbols outside $...$ in math tags
+  // Fix arrows like \to or \rightarrow
+  text = text.replace(/(?<!\$)\\(?:to|rightarrow)(?!\$)/g, ' $\\to$ ');
+  // Fix Ohm symbols like 5k\Omega, \Omega, M\Omega
+  text = text.replace(/([0-9.]+)?\s*(?:k|M|m)?\\Omega/g, (match) => ` $${match.trim()}$ `);
+  // Fix micro symbols like \muA, \muF outside math
+  text = text.replace(/(?<!\$)\\(?:mu|micro)\s*(A|F|V|s)?(?!\$)/g, (_, unit) => ` $\\mu${unit ? `\\text{${unit}}` : ''}$ `);
+
+  // 7. Fix ?=I2 query tags from circuit labelings
+  text = text.replace(/\?=(I[0-9a-zA-Z_]+|V[0-9a-zA-Z_]+)/g, '($1 = ?)');
+
+  // 8. Fix unclosed dollar sign on individual lines (e.g. "• $D_1$ is ON. $V_{cathode_D1} =")
+  const lines = text.split('\n');
+  const fixedLines = lines.map((line) => {
+    // Count unescaped dollar signs
+    const matches = line.match(/(?<!\\)\$/g);
+    if (matches && matches.length % 2 !== 0) {
+      // Append closing $ at end of line so KaTeX tokenization succeeds
+      return line.trimEnd() + '$';
+    }
+    return line;
+  });
+  text = fixedLines.join('\n');
+
   return text;
 }
 
@@ -53,7 +79,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) =
   const normalizedContent = useMemo(() => preprocessLaTeX(content), [content]);
 
   return (
-    <div className="prose prose-invert prose-sm max-w-none text-slate-200 leading-relaxed space-y-2">
+    <div className="prose prose-invert prose-sm max-w-none text-slate-200 leading-relaxed space-y-2.5">
       <ReactMarkdown
         remarkPlugins={[remarkGfm, [remarkMath, { singleDollarTextMath: true }]]}
         rehypePlugins={[[rehypeKatex, { output: 'htmlAndMathml', throwOnError: false }]]}
@@ -74,36 +100,36 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) =
             );
           },
           p({ children }) {
-            return <p className="mb-2.5 last:mb-0 text-slate-300 text-sm leading-relaxed">{children}</p>;
+            return <p className="mb-2 last:mb-0 text-slate-200 text-sm leading-relaxed">{children}</p>;
           },
           h1({ children }) {
-            return <h1 className="text-lg font-semibold text-slate-100 mt-4 mb-2">{children}</h1>;
+            return <h1 className="text-lg font-bold text-slate-100 mt-4 mb-2 border-b border-slate-800 pb-1">{children}</h1>;
           },
           h2({ children }) {
-            return <h2 className="text-base font-semibold text-slate-100 mt-3 mb-1.5">{children}</h2>;
+            return <h2 className="text-base font-semibold text-cyan-300 mt-3.5 mb-1.5">{children}</h2>;
           },
           h3({ children }) {
-            return <h3 className="text-sm font-semibold text-slate-200 mt-2 mb-1">{children}</h3>;
+            return <h3 className="text-sm font-semibold text-slate-100 mt-2.5 mb-1">{children}</h3>;
           },
           ul({ children }) {
-            return <ul className="list-disc list-outside pl-5 mb-2.5 space-y-1 text-slate-300 text-sm">{children}</ul>;
+            return <ul className="list-disc list-outside pl-5 mb-2.5 space-y-1.5 text-slate-200 text-sm">{children}</ul>;
           },
           ol({ children }) {
-            return <ol className="list-decimal list-outside pl-5 mb-2.5 space-y-1 text-slate-300 text-sm">{children}</ol>;
+            return <ol className="list-decimal list-outside pl-5 mb-2.5 space-y-1.5 text-slate-200 text-sm">{children}</ol>;
           },
           li({ children }) {
-            return <li className="text-slate-300">{children}</li>;
+            return <li className="text-slate-200 leading-relaxed pl-1">{children}</li>;
           },
           blockquote({ children }) {
             return (
-              <blockquote className="border-l-2 border-brand-indigo/60 pl-3 italic text-slate-400 my-2 text-sm bg-space-900/40 py-1 rounded-r">
+              <blockquote className="border-l-3 border-cyan-500/80 pl-3.5 italic text-slate-300 my-2.5 text-sm bg-space-900/60 py-1.5 rounded-r">
                 {children}
               </blockquote>
             );
           },
           table({ children }) {
             return (
-              <div className="overflow-x-auto my-3 rounded border border-slate-700/60">
+              <div className="overflow-x-auto my-3 rounded-xl border border-slate-700/60 shadow-sm">
                 <table className="min-w-full divide-y divide-slate-700/60 text-xs text-left">
                   {children}
                 </table>
@@ -111,10 +137,10 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) =
             );
           },
           th({ children }) {
-            return <th className="px-3 py-2 bg-space-850 font-semibold text-slate-200">{children}</th>;
+            return <th className="px-3.5 py-2.5 bg-space-850 font-semibold text-slate-200">{children}</th>;
           },
           td({ children }) {
-            return <td className="px-3 py-1.5 border-t border-slate-800/80 text-slate-300">{children}</td>;
+            return <td className="px-3.5 py-2 border-t border-slate-800/80 text-slate-300">{children}</td>;
           },
           a({ href, children }) {
             return (

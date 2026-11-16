@@ -1,6 +1,7 @@
 import React from 'react';
 import { Check, X, Layers, Sparkles, Code2, Atom, Cpu, Languages, Zap, Info } from 'lucide-react';
 import { ModelInfo } from '../types';
+import { useLanguage } from '../i18n/LanguageContext';
 
 interface ModelSelectorProps {
   isOpen: boolean;
@@ -21,10 +22,61 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
   onSelectPreset,
   maxModels = 6,
 }) => {
+  const { language, t } = useLanguage();
   if (!isOpen) return null;
 
   // Presets mapping directly to real NVIDIA NIM model IDs
-  const presets = [
+  const presets = language === 'en' ? [
+    {
+      label: 'Balanced Trio (Sonnet + GPT-5 + Opus)',
+      icon: Sparkles,
+      ids: [
+        'poolside/laguna-xs-2.1',
+        'nvidia/nemotron-3.5-lightning-30b-a3b',
+        'nvidia/nemotron-3-ultra-550b-a55b',
+      ],
+    },
+    {
+      label: 'Coding & Architecture (Sonnet Tier)',
+      icon: Code2,
+      ids: [
+        'poolside/laguna-xs-2.1',
+        'nvidia/nemotron-3.5-lightning-30b-a3b',
+      ],
+    },
+    {
+      label: 'Circuit & Vision (4-Argon)',
+      icon: Cpu,
+      ids: [
+        'nvidia/nemotron-3.5-super-vl-120b-a12b',
+        'nvidia/nemotron-3.5-lightning-30b-a3b',
+      ],
+    },
+    {
+      label: 'Sub-Second Speed (Gemini Flash)',
+      icon: Zap,
+      ids: [
+        'nvidia/nemotron-3.5-bolt-e4b',
+        'poolside/laguna-xs-2.1',
+      ],
+    },
+    {
+      label: 'STEM Science & Physics (4-Hydrogen)',
+      icon: Atom,
+      ids: [
+        'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning',
+        'nvidia/nemotron-3-ultra-550b-a55b',
+      ],
+    },
+    {
+      label: 'Neural Translation (Riva)',
+      icon: Languages,
+      ids: [
+        'nvidia/riva-translate-4b-instruct-v2',
+        'nvidia/nemotron-3.5-bolt-e4b',
+      ],
+    },
+  ] : [
     {
       label: 'Dengeli Üçlü (Sonnet + GPT-5 + Opus)',
       icon: Sparkles,
@@ -43,7 +95,15 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
       ],
     },
     {
-      label: 'Hızlı & Flash (Gemini Flash Muadili)',
+      label: 'Devre & Görsel (4-Argon)',
+      icon: Cpu,
+      ids: [
+        'nvidia/nemotron-3.5-super-vl-120b-a12b',
+        'nvidia/nemotron-3.5-lightning-30b-a3b',
+      ],
+    },
+    {
+      label: 'Hızlı & Flash (Gemini Flash)',
       icon: Zap,
       ids: [
         'nvidia/nemotron-3.5-bolt-e4b',
@@ -56,14 +116,6 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
       ids: [
         'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning',
         'nvidia/nemotron-3-ultra-550b-a55b',
-      ],
-    },
-    {
-      label: 'Robotik & Donanım (4-Argon)',
-      icon: Cpu,
-      ids: [
-        'nvidia/nemotron-3.5-super-vl-120b-a12b',
-        'nvidia/nemotron-3.5-bolt-e4b',
       ],
     },
     {
@@ -86,9 +138,9 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
               <Layers className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-base font-semibold text-slate-100">NVIDIA NIM Uzman Model Kataloğu</h2>
+              <h2 className="text-base font-semibold text-slate-100">{t.modalTitle}</h2>
               <p className="text-xs text-slate-400">
-                Frontier modellerin (Claude, GPT-5, Gemini Flash) NVIDIA NIM altyapısındaki gerçek muadilleri ({selectedModelIds.length}/{maxModels} seçili)
+                {t.modalSubtitle} ({selectedModelIds.length}/{maxModels} {t.activeCount.toLowerCase()})
               </p>
             </div>
           </div>
@@ -102,7 +154,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
 
         {/* Quick Presets Bar */}
         <div className="flex items-center gap-2 px-6 py-3 border-b border-slate-800/80 bg-space-950/40 overflow-x-auto custom-scrollbar">
-          <span className="text-xs font-medium text-slate-400 shrink-0 mr-1">Ön Ayarlar:</span>
+          <span className="text-xs font-medium text-slate-400 shrink-0 mr-1">{language === 'en' ? 'Presets:' : 'Ön Ayarlar:'}</span>
           {presets.map((preset) => {
             const Icon = preset.icon;
             const isCurrent =
@@ -118,62 +170,59 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
                     : 'bg-space-800 text-slate-300 hover:bg-space-700 hover:text-slate-100 border border-slate-700/60'
                 }`}
               >
-                <Icon className="w-3.5 h-3.5" />
+                <Icon className="w-3.5 h-3.5 text-cyan-400" />
                 <span>{preset.label}</span>
               </button>
             );
           })}
         </div>
 
-        {/* Model Cards Grid */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-3 custom-scrollbar">
+        {/* Models Grid */}
+        <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
             {models.map((model) => {
               const isSelected = selectedModelIds.includes(model.id);
-              const isDisabled = !isSelected && selectedModelIds.length >= maxModels;
+              const isVision = model.id.includes('vl') || model.tags.includes('vision');
 
               return (
                 <div
                   key={model.id}
-                  onClick={() => {
-                    if (!isDisabled) onToggleModel(model.id);
-                  }}
-                  className={`relative flex flex-col p-4 rounded-xl border transition-all cursor-pointer ${
+                  onClick={() => onToggleModel(model.id)}
+                  className={`flex flex-col justify-between p-4 rounded-xl cursor-pointer border transition-all ${
                     isSelected
-                      ? 'bg-brand-indigo/15 border-cyan-500/70 shadow-md shadow-cyan-950/30'
-                      : isDisabled
-                      ? 'bg-space-950/40 border-slate-800/40 opacity-45 cursor-not-allowed'
-                      : 'bg-space-850/70 border-slate-800 hover:border-slate-700 hover:bg-space-800/60'
+                      ? 'bg-space-850 border-cyan-500/80 shadow-md shadow-cyan-950/20 ring-1 ring-cyan-500/40'
+                      : 'bg-space-950/60 border-slate-800 hover:border-slate-700/80 hover:bg-space-850/50'
                   }`}
                 >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-semibold text-sm text-slate-100 truncate">
+                  <div className="flex items-start justify-between gap-3 mb-2">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-semibold text-slate-100">
                           {model.name}
                         </span>
-                        <span className="text-[10px] bg-cyan-950/80 text-cyan-300 border border-cyan-800/60 px-1.5 py-0.2 rounded font-mono font-medium">
-                          {model.provider}
-                        </span>
+                        {isVision && (
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-950/80 text-emerald-300 border border-emerald-800/60 font-medium">
+                            Vision / Devre
+                          </span>
+                        )}
                       </div>
-                      <span className="inline-block text-[11px] font-mono text-slate-400 mb-2 truncate">
+                      <span className="font-mono text-[10px] text-slate-500 block truncate">
                         {model.id}
                       </span>
                     </div>
 
-                    {/* Checkbox indicator */}
                     <div
-                      className={`flex items-center justify-center w-5 h-5 rounded-md border shrink-0 transition-all ${
+                      className={`w-5 h-5 rounded-md flex items-center justify-center border transition-all shrink-0 mt-0.5 ${
                         isSelected
-                          ? 'bg-cyan-500 border-cyan-400 text-space-950 font-bold'
-                          : 'border-slate-700 bg-space-800'
+                          ? 'bg-cyan-500 border-cyan-400 text-space-950'
+                          : 'border-slate-700 bg-space-800 text-transparent'
                       }`}
                     >
-                      {isSelected && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+                      <Check className="w-3.5 h-3.5 stroke-[3]" />
                     </div>
                   </div>
 
-                  <p className="text-xs text-slate-300 line-clamp-2 mb-3 leading-relaxed">
+                  <p className="text-xs text-slate-400 leading-relaxed mb-3 line-clamp-2">
                     {model.description}
                   </p>
 
@@ -195,13 +244,13 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
         <div className="flex items-center justify-between px-6 py-4 border-t border-slate-800 bg-space-850/80">
           <div className="flex items-center gap-2 text-xs text-slate-400">
             <Info className="w-4 h-4 text-cyan-400 shrink-0" />
-            <span>Tüm modeller doğrudan resmi NVIDIA NIM API üzerinden ücretsiz ve eşzamanlı sorgulanır.</span>
+            <span>NVIDIA NIM API microservices.</span>
           </div>
           <button
             onClick={onClose}
             className="px-5 py-2 text-xs font-semibold rounded-lg bg-cyan-500 hover:bg-cyan-400 text-space-950 transition-colors shadow-sm"
           >
-            Seçimi Uygula ({selectedModelIds.length} Model)
+            {t.doneBtn} ({selectedModelIds.length} {t.modelsLabel})
           </button>
         </div>
       </div>
