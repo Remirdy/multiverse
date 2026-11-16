@@ -1,14 +1,14 @@
 import base64
-import io
 from fastapi import APIRouter, UploadFile, File, HTTPException
-import pypdf
+import pymupdf
 
 router = APIRouter(prefix="/upload", tags=["Upload"])
 
 @router.post("")
 async def upload_file(file: UploadFile = File(...)):
     """
-    Upload and parse documents (PDF, code, txt) or images for multi-model comparison.
+    Upload and parse documents (PDF with visual schematics, code, txt) or images for multi-model comparison.
+    Renders PDF pages as images so Vision models can see circuit diagrams and schematics.
     """
     filename = file.filename or "uploaded_file"
     content_type = file.content_type or "application/octet-stream"
@@ -42,17 +42,31 @@ async def upload_file(file: UploadFile = File(...)):
     is_pdf = content_type == "application/pdf" or lower_name.endswith(".pdf")
     if is_pdf:
         try:
-            reader = pypdf.PdfReader(io.BytesIO(contents))
+            doc = pymupdf.open(stream=contents, filetype="pdf")
             pages_text = []
-            for i, page in enumerate(reader.pages[:50]):  # up to 50 pages
-                text = page.extract_text() or ""
+            page_images = []
+            
+            for i, page in enumerate(doc):
+                text = page.get_text() or ""
                 if text.strip():
                     pages_text.append(f"--- Sayfa {i+1} ---\n{text.strip()}")
+                
+                # Render the first 4 pages as high-resolution images for Vision models (circuit diagrams, charts)
+                if i < 4:
+                    pix = page.get_pixmap(dpi=130)
+                    png_bytes = pix.tobytes("png")
+                    b64_page = base64.b64encode(png_bytes).decode("utf-8")
+                    page_images.append(f"data:image/png;base64,{b64_page}")
+            
             extracted_text = "\n\n".join(pages_text)
             if not extracted_text.strip():
-                extracted_text = "[PDF taranmış görsel veya metin içermeyen sayfalardan oluşuyor]"
+                extracted_text = "[PDF görsel ve şemalardan oluşmaktadır. Görsel modeli şemaları doğrudan inceleyecektir]"
             
             preview = extracted_text[:200] + ("..." if len(extracted_text) > 200 else "")
+            
+            # Thumbnail for first page
+            data_url = page_images[0] if page_images else None
+            
             return {
                 "filename": filename,
                 "content_type": "application/pdf",
@@ -60,7 +74,9 @@ async def upload_file(file: UploadFile = File(...)):
                 "size": size,
                 "extracted_text": extracted_text,
                 "preview": preview,
-                "page_count": len(reader.pages)
+                "page_count": len(doc),
+                "data_url": data_url,
+                "page_images": page_images
             }
         except Exception as e:
             raise HTTPException(status_code=400, detail=f"PDF belgesi işlenemedi: {str(e)}")

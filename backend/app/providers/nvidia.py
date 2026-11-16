@@ -65,10 +65,17 @@ class NvidiaProvider(BaseProvider):
                 fname = getattr(item, "filename", None) or (item.get("filename") if isinstance(item, dict) else "Attachment")
                 text = getattr(item, "extracted_text", None) or (item.get("extracted_text") if isinstance(item, dict) else "")
                 durl = getattr(item, "data_url", None) or (item.get("data_url") if isinstance(item, dict) else "")
+                pimages = getattr(item, "page_images", None) or (item.get("page_images") if isinstance(item, dict) else None)
 
-                if ftype == "image" or durl:
+                if ftype == "image" and durl:
                     image_attachments.append({"filename": fname, "data_url": durl})
-                elif text:
+                
+                # If PDF has rendered page images, add them for vision models
+                if pimages:
+                    for p_idx, p_url in enumerate(pimages):
+                        image_attachments.append({"filename": f"{fname} Sayfa {p_idx+1}", "data_url": p_url})
+
+                if text:
                     doc_parts.append(f"📄 **[Ekli Belge: {fname}]**\n```\n{text[:35000]}\n```")
 
         doc_context = ("\n\n".join(doc_parts) + "\n\n---\n") if doc_parts else ""
@@ -86,15 +93,15 @@ class NvidiaProvider(BaseProvider):
         if image_attachments:
             if is_vision:
                 content_blocks = [{"type": "text", "text": effective_prompt}]
-                for img in image_attachments:
+                for img in image_attachments[:5]:  # send up to 5 visual diagrams/pages
                     content_blocks.append({
                         "type": "image_url",
                         "image_url": {"url": img["data_url"]}
                     })
                 messages.append({"role": "user", "content": content_blocks})
             else:
-                img_names = ", ".join([img["filename"] for img in image_attachments])
-                note = f"ℹ️ *[Kullanıcı {img_names} görselini ekledi. Bu model metin tabanlı olduğu için sadece soru metnini ve ekli belgeleri değerlendirmektedir]*\n\n"
+                img_names = ", ".join([img["filename"] for img in image_attachments[:3]])
+                note = f"ℹ️ *[Kullanıcı {img_names} devre şeması/görseli ekledi. Bu model saf metin tabanlı olduğu için devre çizimlerini görememektedir; görsel şemaların çözümü için 'Nemotron Super VL 120B (Görsel & Devre)' modelini seçmelisiniz]*\n\n"
                 messages.append({"role": "user", "content": note + effective_prompt})
         else:
             messages.append({"role": "user", "content": effective_prompt})

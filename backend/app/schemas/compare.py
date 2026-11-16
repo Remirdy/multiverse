@@ -9,6 +9,8 @@ class AttachmentItem(BaseModel):
     data_url: Optional[str] = None  # for images
     extracted_text: Optional[str] = None  # for documents
     preview: Optional[str] = None
+    page_count: Optional[int] = None
+    page_images: Optional[List[str]] = None  # Rendered PDF pages as images for Vision models
 
 class CompareRequest(BaseModel):
     prompt: str = Field(..., min_length=1, description="User prompt to compare across models")

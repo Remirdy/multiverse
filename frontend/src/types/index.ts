@@ -25,6 +25,7 @@ export interface AttachmentItem {
   extracted_text?: string;
   preview?: string;
   page_count?: number;
+  page_images?: string[];
 }
 
 export interface ModelResult {

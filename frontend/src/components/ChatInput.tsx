@@ -9,6 +9,7 @@ interface ChatInputProps {
   selectedModels: ModelInfo[];
   onOpenModelSelector: () => void;
   onPromptChange?: (prompt: string) => void;
+  onAddVisionModel?: () => void;
 }
 
 export const ChatInput: React.FC<ChatInputProps> = ({
@@ -17,6 +18,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   selectedModels,
   onOpenModelSelector,
   onPromptChange,
+  onAddVisionModel,
 }) => {
   const [prompt, setPrompt] = useState('');
   const [systemPrompt, setSystemPrompt] = useState('');
@@ -198,6 +200,25 @@ export const ChatInput: React.FC<ChatInputProps> = ({
             </button>
           </div>
         </div>
+
+        {/* Vision Model Recommendation Banner for Schematics/Diagrams */}
+        {attachments.length > 0 && !selectedModels.some((m) => m.id.includes('vl') || m.id.includes('vision')) && (
+          <div className="flex items-center justify-between gap-2 px-3.5 py-1.5 bg-cyan-950/40 border-b border-cyan-800/40 text-[11px] text-cyan-200">
+            <div className="flex items-center gap-1.5 truncate">
+              <Sparkles className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+              <span className="truncate">Devre şeması veya çizimleri incelemek için <strong>Nemotron Super VL 120B (Görsel Model)</strong> önerilir.</span>
+            </div>
+            {onAddVisionModel && (
+              <button
+                type="button"
+                onClick={onAddVisionModel}
+                className="px-2 py-0.5 rounded bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-400/40 text-cyan-300 font-medium text-[10px] shrink-0 transition-colors"
+              >
+                + Modeli Ekle
+              </button>
+            )}
+          </div>
+        )}
 
         {/* Uploaded Attachments Preview Bar */}
         {(attachments.length > 0 || isUploading) && (

@@ -301,6 +301,15 @@ export const App: React.FC = () => {
     selectedModelIds.includes(m.id)
   );
 
+  const handleAddVisionModel = () => {
+    const visionModel = models.find(
+      (m) => m.id.includes('vl') || m.id.includes('vision') || m.tags.includes('vision')
+    );
+    if (visionModel && !selectedModelIds.includes(visionModel.id)) {
+      setSelectedModelIds((prev) => [...prev, visionModel.id]);
+    }
+  };
+
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-space-950 text-slate-100">
       {/* Sidebar */}
@@ -364,6 +373,7 @@ export const App: React.FC = () => {
           selectedModels={selectedModelObjects}
           onOpenModelSelector={() => setIsModelSelectorOpen(true)}
           onPromptChange={handlePromptChange}
+          onAddVisionModel={handleAddVisionModel}
         />
       </div>
 
