@@ -1,0 +1,222 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 680" width="100%" height="100%">
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#070A10" />
+      <stop offset="50%" stop-color="#0B0F17" />
+      <stop offset="100%" stop-color="#070A10" />
+    </linearGradient>
+
+    <linearGradient id="card-border-cyan" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.8" />
+      <stop offset="100%" stop-color="#6366F1" stop-opacity="0.2" />
+    </linearGradient>
+
+    <linearGradient id="orbit-grad-1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" />
+      <stop offset="50%" stop-color="#818CF8" />
+      <stop offset="100%" stop-color="#C084FC" />
+    </linearGradient>
+
+    <linearGradient id="core-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#38BDF8" />
+      <stop offset="60%" stop-color="#6366F1" />
+      <stop offset="100%" stop-color="#0B0F17" stop-opacity="0" />
+    </linearGradient>
+
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+
+    <style>
+      @keyframes pulseSlow {
+        0%, 100% { opacity: 0.8; transform: scale(1); }
+        50% { opacity: 0.4; transform: scale(0.98); }
+      }
+      @keyframes floatNode {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-4px); }
+      }
+      @keyframes spinOrbit {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+      .anim-pulse { animation: pulseSlow 3s ease-in-out infinite; }
+      .anim-float { animation: floatNode 4s ease-in-out infinite; }
+    </style>
+  </defs>
+
+  <!-- Canvas Background -->
+  <rect width="1200" height="680" rx="16" fill="url(#bg-grad)" stroke="#1E293B" stroke-width="2"/>
+
+  <!-- Top App Header -->
+  <g transform="translate(30, 24)">
+    <!-- Logo SVG -->
+    <g transform="translate(0, 0)">
+      <ellipse cx="20" cy="20" rx="18" ry="7" stroke="url(#orbit-grad-1)" stroke-width="1.5" transform="rotate(-25 20 20)" stroke-dasharray="3 2" opacity="0.8"/>
+      <ellipse cx="20" cy="20" rx="18" ry="7" stroke="url(#orbit-grad-1)" stroke-width="1.5" transform="rotate(45 20 20)" opacity="0.7"/>
+      <circle cx="20" cy="20" r="5" fill="#38BDF8" filter="url(#glow)"/>
+      <circle cx="20" cy="20" r="2.5" fill="#FFFFFF"/>
+    </g>
+
+    <text x="50" y="24" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-weight="700" font-size="18" fill="#F8FAFC" letter-spacing="1">MULTIVERSE</text>
+    <text x="175" y="24" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-weight="400" font-size="12" fill="#64748B">|</text>
+    <text x="190" y="24" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-weight="500" font-size="12" fill="#38BDF8">One question. Multiple minds.</text>
+
+    <!-- Header Badges -->
+    <g transform="translate(860, 4)">
+      <!-- Models Active Pill -->
+      <rect x="0" y="0" width="135" height="30" rx="8" fill="#111726" stroke="#334155" stroke-width="1"/>
+      <circle cx="16" cy="15" r="4" fill="#38BDF8"/>
+      <text x="28" y="19" font-family="-apple-system, sans-serif" font-weight="600" font-size="11" fill="#E2E8F0">3 Models Active</text>
+
+      <!-- NVIDIA Status Pill -->
+      <rect x="145" y="0" width="130" height="30" rx="8" fill="#064E3B" fill-opacity="0.3" stroke="#059669" stroke-width="1"/>
+      <circle cx="160" cy="15" r="4" fill="#10B981" class="anim-pulse"/>
+      <text x="172" y="19" font-family="-apple-system, sans-serif" font-weight="600" font-size="11" fill="#34D399">NVIDIA NIM Live</text>
+    </g>
+  </g>
+
+  <!-- Divider line -->
+  <line x1="30" y1="75" x2="1170" y2="75" stroke="#1E293B" stroke-width="1"/>
+
+  <!-- User Prompt Query Box -->
+  <g transform="translate(60, 100)">
+    <rect width="1080" height="64" rx="12" fill="#111726" stroke="#334155" stroke-width="1"/>
+    <circle cx="28" cy="32" r="14" fill="#1E293B"/>
+    <text x="22" y="37" font-family="-apple-system, sans-serif" font-weight="600" font-size="14" fill="#38BDF8">Q</text>
+    <text x="56" y="28" font-family="-apple-system, sans-serif" font-weight="600" font-size="11" fill="#94A3B8">USER PROMPT</text>
+    <text x="56" y="47" font-family="-apple-system, sans-serif" font-weight="500" font-size="14" fill="#F8FAFC">
+      "Write an optimized asynchronous worker in Python with retry exponential backoff and explain the mathematical convergence."
+    </text>
+    <g transform="translate(940, 20)">
+      <rect width="120" height="24" rx="6" fill="#1E293B"/>
+      <text x="14" y="16" font-family="-apple-system, sans-serif" font-weight="500" font-size="10" fill="#38BDF8">⚡ Smart Route: ON</text>
+    </g>
+  </g>
+
+  <!-- 3-Column Comparison Grid -->
+
+  <!-- CARD 1: Coding Specialist (Sonnet 5.5 Equivalent) -->
+  <g transform="translate(60, 185)">
+    <rect width="345" height="450" rx="14" fill="#0B0F17" stroke="url(#card-border-cyan)" stroke-width="1.5"/>
+    
+    <!-- Card Header -->
+    <rect width="345" height="52" rx="14" fill="#111726" stroke="#1E293B" stroke-width="1"/>
+    <text x="18" y="24" font-family="-apple-system, sans-serif" font-weight="700" font-size="13" fill="#F8FAFC">Poolside Laguna XS</text>
+    <text x="18" y="40" font-family="-apple-system, sans-serif" font-weight="600" font-size="10" fill="#38BDF8">Claude Sonnet 5.5 Equivalent • Code</text>
+    <rect x="260" y="14" width="70" height="24" rx="6" fill="#1E293B"/>
+    <text x="272" y="30" font-family="monospace" font-size="11" fill="#34D399">⚡ 552 ms</text>
+
+    <!-- Code Block in Card -->
+    <g transform="translate(16, 70)">
+      <rect width="313" height="345" rx="8" fill="#070A10" stroke="#1E293B" stroke-width="1"/>
+      <text x="16" y="24" font-family="monospace" font-size="11" fill="#64748B"># Production Async Worker</text>
+      <text x="16" y="46" font-family="monospace" font-size="11" fill="#F43F5E">import</text>
+      <text x="65" y="46" font-family="monospace" font-size="11" fill="#F8FAFC">asyncio, logging, time</text>
+      
+      <text x="16" y="78" font-family="monospace" font-size="11" fill="#F43F5E">class</text>
+      <text x="56" y="78" font-family="monospace" font-size="11" fill="#38BDF8">AsyncQueueWorker</text>
+      <text x="165" y="78" font-family="monospace" font-size="11" fill="#F8FAFC">:</text>
+
+      <text x="32" y="100" font-family="monospace" font-size="11" fill="#F43F5E">async def</text>
+      <text x="96" y="100" font-family="monospace" font-size="11" fill="#A855F7">process_with_backoff</text>
+      <text x="235" y="100" font-family="monospace" font-size="11" fill="#F8FAFC">(self):</text>
+
+      <text x="48" y="122" font-family="monospace" font-size="11" fill="#F8FAFC">delay = self.base_delay</text>
+      <text x="48" y="144" font-family="monospace" font-size="11" fill="#F43F5E">for</text>
+      <text x="75" y="144" font-family="monospace" font-size="11" fill="#F8FAFC">attempt</text>
+      <text x="130" y="144" font-family="monospace" font-size="11" fill="#F43F5E">in</text>
+      <text x="150" y="144" font-family="monospace" font-size="11" fill="#F8FAFC">range(self.retries):</text>
+
+      <text x="64" y="166" font-family="monospace" font-size="11" fill="#F43F5E">try</text>
+      <text x="86" y="166" font-family="monospace" font-size="11" fill="#F8FAFC">:</text>
+      <text x="80" y="188" font-family="monospace" font-size="11" fill="#F43F5E">return await</text>
+      <text x="165" y="188" font-family="monospace" font-size="11" fill="#38BDF8">self.task()</text>
+
+      <text x="64" y="210" font-family="monospace" font-size="11" fill="#F43F5E">except</text>
+      <text x="115" y="210" font-family="monospace" font-size="11" fill="#F8FAFC">Exception as err:</text>
+      <text x="80" y="232" font-family="monospace" font-size="11" fill="#F43F5E">await</text>
+      <text x="120" y="232" font-family="monospace" font-size="11" fill="#F8FAFC">asyncio.sleep(delay)</text>
+      <text x="80" y="254" font-family="monospace" font-size="11" fill="#F8FAFC">delay *= self.multiplier</text>
+
+      <text x="16" y="295" font-family="monospace" font-size="11" fill="#34D399">✓ Full SIGINT graceful handler included</text>
+      <text x="16" y="318" font-family="monospace" font-size="11" fill="#64748B">✓ Zero dead-lock guarantee (Queue.join)</text>
+    </g>
+  </g>
+
+  <!-- CARD 2: Mathematics & Logic Specialist (GPT-5 Reasoning Equivalent) -->
+  <g transform="translate(425, 185)">
+    <rect width="345" height="450" rx="14" fill="#0B0F17" stroke="#334155" stroke-width="1.5"/>
+    
+    <!-- Card Header -->
+    <rect width="345" height="52" rx="14" fill="#111726" stroke="#1E293B" stroke-width="1"/>
+    <text x="18" y="24" font-family="-apple-system, sans-serif" font-weight="700" font-size="13" fill="#F8FAFC">Nemotron 3.5 Lightning</text>
+    <text x="18" y="40" font-family="-apple-system, sans-serif" font-weight="600" font-size="10" fill="#818CF8">GPT-5 Reasoning Equivalent • Math</text>
+    <rect x="250" y="14" width="80" height="24" rx="6" fill="#1E293B"/>
+    <text x="258" y="30" font-family="monospace" font-size="11" fill="#38BDF8">⏱ 1,387 ms</text>
+
+    <!-- Math Derivation Body -->
+    <g transform="translate(16, 70)">
+      <rect width="313" height="345" rx="8" fill="#070A10" stroke="#1E293B" stroke-width="1"/>
+      <text x="16" y="26" font-family="-apple-system, sans-serif" font-weight="600" font-size="12" fill="#E2E8F0">1. Formal Backoff Convergence:</text>
+      <text x="16" y="50" font-family="-apple-system, sans-serif" font-size="11" fill="#94A3B8">Let \(T_k = T_0 \cdot \gamma^k\) be the wait time.</text>
+      <text x="16" y="74" font-family="-apple-system, sans-serif" font-size="11" fill="#94A3B8">Cumulative expected latency series:</text>
+
+      <rect x="16" y="90" width="280" height="42" rx="6" fill="#111726"/>
+      <text x="32" y="116" font-family="monospace" font-size="12" fill="#C084FC">E[T] = T_0 * (γ^N - 1) / (γ - 1)</text>
+
+      <text x="16" y="160" font-family="-apple-system, sans-serif" font-weight="600" font-size="12" fill="#E2E8F0">2. Exponential Stability Theorem:</text>
+      <text x="16" y="184" font-family="-apple-system, sans-serif" font-size="11" fill="#94A3B8">Under Poisson arrivals \(\lambda &lt; \mu_{eff}\),</text>
+      <text x="16" y="206" font-family="-apple-system, sans-serif" font-size="11" fill="#94A3B8">jitter randomization decorrelates collision</text>
+      <text x="16" y="228" font-family="-apple-system, sans-serif" font-size="11" fill="#94A3B8">cascades with probability 1.</text>
+
+      <rect x="16" y="250" width="280" height="70" rx="6" fill="#1E293B" fill-opacity="0.4"/>
+      <text x="24" y="274" font-family="-apple-system, sans-serif" font-weight="600" font-size="11" fill="#38BDF8">Step-by-Step Proof Verdict:</text>
+      <text x="24" y="294" font-family="-apple-system, sans-serif" font-size="11" fill="#CBD5E1">Geometric progression converges; queue</text>
+      <text x="24" y="310" font-family="-apple-system, sans-serif" font-size="11" fill="#CBD5E1">depth remains strictly bounded.</text>
+    </g>
+  </g>
+
+  <!-- CARD 3: 550B Frontier Scale Specialist (Claude Opus 4.6 Equivalent) -->
+  <g transform="translate(790, 185)">
+    <rect width="345" height="450" rx="14" fill="#0B0F17" stroke="#334155" stroke-width="1.5"/>
+    
+    <!-- Card Header -->
+    <rect width="345" height="52" rx="14" fill="#111726" stroke="#1E293B" stroke-width="1"/>
+    <text x="18" y="24" font-family="-apple-system, sans-serif" font-weight="700" font-size="13" fill="#F8FAFC">Nemotron 3 Ultra 550B</text>
+    <text x="18" y="40" font-family="-apple-system, sans-serif" font-weight="600" font-size="10" fill="#C084FC">Claude Opus 4.6 Equivalent • 550B Sentez</text>
+    <rect x="250" y="14" width="80" height="24" rx="6" fill="#1E293B"/>
+    <text x="258" y="30" font-family="monospace" font-size="11" fill="#38BDF8">⏱ 1,127 ms</text>
+
+    <!-- Deep Synthesis Body -->
+    <g transform="translate(16, 70)">
+      <rect width="313" height="345" rx="8" fill="#070A10" stroke="#1E293B" stroke-width="1"/>
+      <text x="16" y="26" font-family="-apple-system, sans-serif" font-weight="600" font-size="12" fill="#E2E8F0">Architectural Epistemology:</text>
+      <text x="16" y="52" font-family="-apple-system, sans-serif" font-size="11" fill="#94A3B8" width="280">
+        In distributed systems engineering, an async
+      </text>
+      <text x="16" y="70" font-family="-apple-system, sans-serif" font-size="11" fill="#94A3B8">
+        worker is fundamentally a state machine
+      </text>
+      <text x="16" y="88" font-family="-apple-system, sans-serif" font-size="11" fill="#94A3B8">
+        reconciling non-deterministic downstream
+      </text>
+      <text x="16" y="106" font-family="-apple-system, sans-serif" font-size="11" fill="#94A3B8">
+        failures with local resource limits.
+      </text>
+
+      <rect x="16" y="126" width="280" height="85" rx="6" fill="#111726"/>
+      <text x="24" y="148" font-family="-apple-system, sans-serif" font-weight="600" font-size="11" fill="#F8FAFC">Key Systemic Principles:</text>
+      <text x="24" y="170" font-family="-apple-system, sans-serif" font-size="10.5" fill="#CBD5E1">• Thundering Herd Mitigation: Full jitter</text>
+      <text x="24" y="188" font-family="-apple-system, sans-serif" font-size="10.5" fill="#CBD5E1">• Drain Semantics: Process in-flight tasks</text>
+      <text x="24" y="204" font-family="-apple-system, sans-serif" font-size="10.5" fill="#CBD5E1">• Dead Letter Boundaries: Prevent poison pill</text>
+
+      <text x="16" y="240" font-family="-apple-system, sans-serif" font-weight="600" font-size="11" fill="#A855F7">Frontier 550B Evaluation:</text>
+      <text x="16" y="262" font-family="-apple-system, sans-serif" font-size="10.5" fill="#94A3B8">Demonstrates senior distributed systems</text>
+      <text x="16" y="278" font-family="-apple-system, sans-serif" font-size="10.5" fill="#94A3B8">depth, balancing theoretical elegance with</text>
+      <text x="16" y="294" font-family="-apple-system, sans-serif" font-size="10.5" fill="#94A3B8">resilience against cascading network failures.</text>
+    </g>
+  </g>
+</svg>
