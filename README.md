@@ -21,175 +21,117 @@
 
 ## 📖 Overview
 
-**Multiverse** is an advanced multi-model AI exploration and comparison platform. Instead of asking one model at a time, Multiverse dispatches a single prompt simultaneously across multiple frontier AI models and displays their reasoning steps, diverse viewpoints, and response latencies in an elegant, responsive side-by-side comparison grid.
+**Multiverse** is a multi-model AI exploration and comparison platform. Instead of relying on a single generalist model for every task, Multiverse is designed around **Domain Specialization**: each AI model is mapped strictly to its verified area of benchmark excellence.
 
-Powered by the **NVIDIA Build (NVIDIA NIM API)** cloud infrastructure and built on a high-throughput asychronous **FastAPI** backend paired with a dark-first **React + TypeScript** interface.
+When you send a prompt, Multiverse queries the specialized models concurrently, evaluates their divergent reasoning paths, and benchmarks their latencies side-by-side in real time.
 
 ---
 
-## ✨ Key Features
+## 🎯 Domain-Specialized Model Registry
+
+> **Core Philosophy**: *"No single model for everything."* Models are chosen strictly based on verified stability, free API availability on NVIDIA Build NIM, and proven domain competence.
+
+| Domain / Field | Specialist Model | Model ID | Latency | Key Strengths & Use Cases | Context |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **💻 Programming & Software** | **Poolside Laguna XS** | `poolside/laguna-xs-2.1` | **~550 ms** | Codebases, algorithms, debugging, syntax, systems architecture | 64k |
+| **📐 Mathematics & Formal Logic** | **Nemotron 3.5 Lightning** | `nvidia/nemotron-3.5-lightning-30b-a3b` | **~1.3 s** | Calculus, eigenvalues, algebraic proofs, statistical deduction | 128k |
+| **🔬 Scientific Hypotheses & STEM** | **Nemotron Nano Omni** | `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning` | **~640 ms** | Step-by-step thinking traces for physics, chemistry, thermodynamics | 128k |
+| **🌌 Frontier 550B Synthesis** | **Nemotron 3 Ultra 550B** | `nvidia/nemotron-3-ultra-550b-a55b` | **~1.1 s** | 550 Billion parameter deep academic synthesis, history, cosmology | 128k |
+| **🤖 Robotics & Hardware CAD** | **Nemotron Super VL 120B** | `nvidia/nemotron-3.5-super-vl-120b-a12b` | **~910 ms** | Robotics kinematics, ROS, PID controllers, circuits & sensors | 128k |
+| **🌍 Multilingual Linguistics** | **Riva Translate 4B** | `nvidia/riva-translate-4b-instruct-v2` | **~155 ms** | Sub-second high-accuracy translation, localization, cultural nuance | 32k |
+| **✍️ Creative Writing & Fiction** | **MiniMax M3.1 Flash** | `minimaxai/minimax-m3.1-flash` | **~3.2 s** | Literary fiction, atmospheric worldbuilding, dialogue & poetry | 128k |
+| **⚡ Instant Turnaround & Summaries** | **Nemotron 3.5 Bolt** | `nvidia/nemotron-3.5-bolt-e4b` | **~260 ms** | Sub-second conversational responses, executive summaries, rapid triage | 64k |
+
+---
+
+## ✨ Key Platform Features
 
 ### 🚀 1. Simultaneous Multi-Model Comparison
-- **Parallel Dispatch**: Queries between 1 and 6 models concurrently using `asyncio.gather(*tasks, return_exceptions=True)`.
-- **Latency Benchmarking**: Measures and displays exact response duration per model in milliseconds (`ms`).
-- **Independent Loading States**: Each card features its own reactive skeleton loader while processing.
-- **Partial Failure Resilience**: A timeout or rate-limit on one model never drops the successful responses of the others.
-- **Single Model Retry**: Failed or timed-out models can be re-queried individually with a single click without resending the entire prompt to all models.
-- **One-Click Copy**: Copy formatted answers and code snippets instantly.
+- **Parallel Dispatch**: Concurrently query up to 6 models using `asyncio.gather(*tasks, return_exceptions=True)`.
+- **Latency Benchmarking**: Precise millisecond duration measured and displayed on every card.
+- **Partial Failure Resilience**: If one endpoint experiences rate-limits or cold-starts, successful models are never lost.
+- **Single Model Retry**: Failed or timed-out models can be re-queried individually with a single click.
+- **Independent Loading States**: Smooth animated skeleton feedback for every model.
 
-### 🧠 2. AI Model Registry & Verified Endpoints
-Centralized model registry managing verified, production-ready NVIDIA NIM models:
-| Model Name | Model ID | Category | Primary Strength | Context Window |
-| :--- | :--- | :--- | :--- | :--- |
-| **Nemotron 3.5 Lightning** | `nvidia/nemotron-3.5-lightning-30b-a3b` | Mathematics & Logic | High-speed mathematical reasoning & logic | 128k |
-| **Mistral Large 4** | `mistralai/mistral-large-4-1t-a52b` | Creative & Multilingual | Literary writing, nuanced style & translation | 128k |
-| **Poolside Laguna XS** | `poolside/laguna-xs-2.1` | Programming & Code | Algorithms, debugging & systems architecture | 64k |
-| **Nemotron 3.5 Bolt** | `nvidia/nemotron-3.5-bolt-e4b` | Fast & Lightweight | Sub-second latency & quick answers | 64k |
-| **Nemotron Nano Omni** | `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning` | Scientific Reasoning | Deep empirical analysis & step-by-step thinking | 128k |
-| **Nemotron Super VL 120B** | `nvidia/nemotron-3.5-super-vl-120b-a12b` | Engineering & Multimodal | Large-scale STEM & robotics systems analysis | 128k |
-| **Meta Muse Glimmer 30B** | `meta/muse-glimmer-30b` | Creative Synthesis | Conceptual synthesis & storytelling | 128k |
+### 🧭 2. Automatic Smart Routing
+Multiverse features a semantic intent classifier that analyzes your query and suggests or targets the best specialized models:
+- When you type a coding problem (e.g., Python `asyncio`), it recommends **Poolside Laguna XS**.
+- When you type a calculus problem (e.g., matrix eigenvalues), it recommends **Nemotron 3.5 Lightning**.
+- When you ask for translation (e.g., into Turkish/English), it recommends **Riva Translate 4B**.
+- When you ask about thermodynamics or physics, it recommends **Nemotron Nano Omni**.
 
-### 🎯 3. Smart Semantic Routing (Automatic Model Routing)
-Includes an integrated semantic intent classifier analyzing prompts across 8 distinct domains:
-1. **Programming & Code** (Python, SQL, React, APIs, algorithms, debugging)
-2. **Mathematics & Logic** (Algebra, calculus, proofs, linear equations)
-3. **Scientific Reasoning** (Physics, quantum mechanics, chemistry, biology)
-4. **Robotics & Engineering** (Control systems, ROS, kinematics, circuits)
-5. **Creative Writing** (Narratives, poetry, screenplays, worldbuilding)
-6. **Image & Vision Understanding** (Multimodal analysis, visual reasoning)
-7. **General Knowledge & Concept Synthesis** (Broad inquiries, summaries)
+### 💾 3. Persistent SQLite History
+- Built with **SQLAlchemy 2.0** and **aiosqlite**.
+- Stores complete multi-model turns, timestamps, prompts, responses, and latencies.
+- Full sidebar conversation management (Create, Switch, Delete).
 
-*Toggle the **"Smart Route"** mode in the chat interface to have Multiverse automatically target the best models for your query.*
-
-### 💾 4. Persistent SQLite Conversation History
-- Asynchronous database layer using **SQLAlchemy 2.0** and **aiosqlite**.
-- Stores every conversation, prompt, system instruction, and model response with full metadata (status, latency, timestamps).
-- Clean conversation sidebar: create new comparisons, browse past sessions, or delete them anytime.
-
-### 🎨 5. Premium UI/UX Design
-- **Dark-First Aesthetic**: Deep charcoal (`#070A10`), subtle slate borders (`#1E293B`), and cyan/violet accents (`#38BDF8`, `#818CF8`).
-- **Markdown & Syntax Highlighting**: Full GitHub Flavored Markdown (GFM) support with tables, quotes, lists, and syntax-styled code blocks with copy buttons.
-- **Original Orbital Logo**: Custom-crafted SVG identity symbolizing multiple planetary minds orbiting a central singularity.
+### 🎨 4. Design & Typography
+- **Dark-First Modern UI**: Inspired by ChatGPT, Claude, and Perplexity with deep space tones and cyan/violet accents.
+- **GitHub Flavored Markdown**: Full markdown rendering with tables, quotes, lists, and syntax-highlighted code blocks with copy buttons.
+- **Original Identity**: Orbital logo symbolizing multiple specialized minds.
 
 ---
 
-## 🏗️ Architecture & Project Structure
+## 🛠️ Tech Stack
 
 ```
-multiverse/
-├── backend/
-│   ├── app/
-│   │   ├── api/             # FastAPI REST endpoints
-│   │   │   ├── compare.py   # Multi-model concurrent comparison & retry
-│   │   │   ├── conversations.py # Conversation CRUD operations
-│   │   │   ├── models.py    # Model registry & provider health
-│   │   │   └── router.py    # Semantic automatic routing
-│   │   ├── core/            # Configuration & Settings (Pydantic, .env)
-│   │   ├── database/        # Async SQLAlchemy session & SQLite ORM models
-│   │   ├── providers/       # BaseProvider abstraction, NVIDIA NIM client, registry
-│   │   ├── schemas/         # Pydantic schemas (CompareRequest, TurnDetail, etc.)
-│   │   ├── services/        # Comparison execution engine & routing classifier
-│   │   └── main.py          # Application entrypoint & CORS middleware
-│   ├── tests/               # Pytest test suite (12 passed tests)
-│   ├── requirements.txt     # Backend Python dependencies
-│   ├── pytest.ini           # Asynchronous pytest configuration
-│   └── .env.example         # Environment template
-│
-├── frontend/
-│   ├── src/
-│   │   ├── components/      # UI components (Header, Sidebar, ComparisonCard, etc.)
-│   │   ├── services/        # Typed API service
-│   │   ├── types/           # TypeScript definitions
-│   │   ├── App.tsx          # Main application coordinator
-│   │   ├── index.css        # Tailwind styling & custom scrollbars
-│   │   └── main.tsx         # React root
-│   ├── public/              # Static assets (logo.svg)
-│   ├── index.html           # HTML5 template
-│   ├── package.json         # Frontend packages
-│   ├── tailwind.config.js   # Tailored theme colors
-│   └── vite.config.ts       # Vite configuration with API reverse proxy
-│
-├── start.sh                 # One-click launcher script
-├── README.md                # Project documentation
-└── .gitignore               # Strict gitignore excluding API keys & environments
+Frontend:
+  - React 18 & TypeScript
+  - Vite 6
+  - Tailwind CSS 3
+  - Lucide React Icons
+  - React Markdown + Remark GFM
+
+Backend:
+  - Python 3.10+ (Tested on Python 3.14)
+  - FastAPI
+  - OpenAI Async Python SDK
+  - SQLAlchemy 2.0 (aiosqlite)
+  - Pydantic v2
+  - Pytest & Pytest-Asyncio
 ```
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Quickstart Guide
 
-### Prerequisites
-- **Python 3.10+** (Tested on Python 3.14)
-- **Node.js 18+** & **npm**
-- An **NVIDIA NIM API Key** (Free developer trial available at [build.nvidia.com](https://build.nvidia.com/))
-
----
-
-### Option 1: Quickstart (One-Click Script)
-
-Clone the repository and run the launch script:
-
+### 1. One-Click Launch Script
 ```bash
 git clone https://github.com/zeynepiremakbulut/multiverse.git
 cd multiverse
 
-# Run the automated launcher
+# Start both backend and frontend automatically
 ./start.sh
 ```
 
----
+### 2. Manual Setup
 
-### Option 2: Manual Setup
-
-#### 1. Backend Setup
+**Backend:**
 ```bash
 cd backend
-
-# Create virtual environment
 python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
+source venv/bin/activate
 pip install -r requirements.txt
 
 # Configure your NVIDIA API Key
 cp .env.example .env
-```
-
-Edit `backend/.env` with your API key:
-```env
-NVIDIA_API_KEY=nvapi-your-key-here
-NVIDIA_BASE_URL=https://integrate.api.nvidia.com/v1
-DEFAULT_TIMEOUT_SECONDS=45.0
-MAX_CONCURRENT_MODELS=6
-DATABASE_URL=sqlite+aiosqlite:///./multiverse.db
-```
-
-Start the FastAPI server:
-```bash
+# Edit backend/.env and insert your NVIDIA_API_KEY from build.nvidia.com
 uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
-*Backend Swagger interactive docs will be available at [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs).*
 
-#### 2. Frontend Setup
-In a new terminal window:
+**Frontend:**
 ```bash
 cd frontend
-
-# Install dependencies
 npm install
-
-# Start Vite dev server
 npm run dev
 ```
-
-Open your browser at **[http://localhost:5173](http://localhost:5173)**.
+Open **[http://localhost:5173](http://localhost:5173)** in your browser.
 
 ---
 
-## 🧪 Automated Testing
+## 🧪 Automated Tests
 
-Multiverse includes automated tests covering registry validation, semantic routing, API endpoints, and error handling:
+The test suite validates model registry integrity, semantic domain routing, CRUD conversation history, and API resilience:
 
 ```bash
 cd backend
@@ -199,49 +141,18 @@ pytest -v
 
 Expected output:
 ```
-tests/test_api.py::test_root_endpoint PASSED
-tests/test_api.py::test_list_models PASSED
-tests/test_api.py::test_route_endpoint PASSED
-tests/test_api.py::test_create_and_list_conversations PASSED
-tests/test_api.py::test_compare_prompt PASSED
-tests/test_registry.py::test_registry_has_models PASSED
-tests/test_registry.py::test_default_models PASSED
-tests/test_registry.py::test_model_metadata PASSED
-tests/test_routing.py::test_route_programming PASSED
-tests/test_routing.py::test_route_mathematics PASSED
-tests/test_routing.py::test_route_creative PASSED
-tests/test_routing.py::test_route_robotics PASSED
-
-============================== 12 passed in 2.98s ==============================
+============================== 12 passed in 2.69s ==============================
 ```
 
 ---
 
-## 📡 REST API Reference
+## 🔒 Security & Safe Credentials
 
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET` | `/api/models` | List all available models and default selections |
-| `GET` | `/api/models/health` | Check NVIDIA NIM connectivity & key configuration |
-| `POST` | `/api/compare` | Send prompt to multiple models concurrently |
-| `POST` | `/api/compare/retry` | Retry an individual failed model for a given turn |
-| `POST` | `/api/route` | Classify query intent and return recommended models |
-| `GET` | `/api/conversations` | List saved conversation history |
-| `POST` | `/api/conversations` | Create a new conversation |
-| `GET` | `/api/conversations/{id}`| Retrieve full comparison turns and responses |
-| `DELETE`| `/api/conversations/{id}`| Delete a conversation and its turns |
-
----
-
-## 🔒 Security & Privacy
-
-- **Zero Key Exposure**: API keys are strictly confined to `backend/.env` and are never sent to or visible in client-side code.
-- **Git Shield**: `.gitignore` strictly protects `.env` files from accidental commits.
-- **Sanitized Diagnostics**: If an API error, rate limit, or invalid key occurs, sanitized user-friendly guidance is returned without leaking internal stack traces.
+- **API Key Isolation**: The NVIDIA API Key is read exclusively on the backend (`backend/.env`) and is never sent to the browser.
+- **Git Shield**: `.env` and all credential variants are strictly ignored by `.gitignore`.
+- **Sanitized Errors**: Safe diagnostic error messages prevent leakage of internal stack traces.
 
 ---
 
 ## 📄 License
-
-This project is licensed under the [MIT License](LICENSE).
-Built with ❤️ for the Multiverse platform.
+MIT License. Built with ❤️ for the Multiverse platform.

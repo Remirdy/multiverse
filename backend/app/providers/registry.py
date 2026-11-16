@@ -4,86 +4,97 @@ from app.schemas.model import ModelInfo
 class ModelRegistry:
     def __init__(self):
         self._models: Dict[str, ModelInfo] = {}
-        self._register_default_models()
+        self._register_specialized_models()
 
-    def _register_default_models(self):
+    def _register_specialized_models(self):
         models = [
-            ModelInfo(
-                id="nvidia/nemotron-3.5-lightning-30b-a3b",
-                name="Nemotron 3.5 Lightning",
-                provider="NVIDIA NIM",
-                description="High-speed NVIDIA reasoning engine optimized for complex mathematical logic and precision analysis.",
-                category="Mathematics & Logic",
-                context_length=128000,
-                is_available=True,
-                is_default=True,
-                tags=["math", "reasoning", "default"]
-            ),
-            ModelInfo(
-                id="mistralai/mistral-large-4-1t-a52b",
-                name="Mistral Large 4",
-                provider="NVIDIA NIM",
-                description="Mistral AI next-generation flagship model with exceptional creative writing and multilingual mastery.",
-                category="Creative & Multilingual",
-                context_length=128000,
-                is_available=True,
-                is_default=True,
-                tags=["creative", "writing", "general", "default"]
-            ),
             ModelInfo(
                 id="poolside/laguna-xs-2.1",
                 name="Poolside Laguna XS",
                 provider="NVIDIA NIM",
-                description="Specialized code and software engineering model designed for algorithms, debugging, and systems architecture.",
-                category="Programming",
+                description="Specialized software engineering model trained on codebases, algorithms, debugging, and systems architecture.",
+                category="Programming & Code",
                 context_length=64000,
                 is_available=True,
                 is_default=True,
-                tags=["programming", "code", "algorithms", "default"]
+                tags=["programming", "code", "algorithms", "debugging", "default"]
             ),
             ModelInfo(
-                id="nvidia/nemotron-3.5-bolt-e4b",
-                name="Nemotron 3.5 Bolt",
+                id="nvidia/nemotron-3.5-lightning-30b-a3b",
+                name="Nemotron 3.5 Lightning",
                 provider="NVIDIA NIM",
-                description="Ultra-fast, low-latency NIM endpoint for instantaneous queries, rapid comparisons, and general assistance.",
-                category="Fast & Lightweight",
-                context_length=64000,
+                description="NVIDIA mathematical engine optimized specifically for formal proofs, calculus, algebra, and high-speed logic.",
+                category="Mathematics & Logic",
+                context_length=128000,
                 is_available=True,
-                is_default=False,
-                tags=["fast", "lightweight", "general"]
+                is_default=True,
+                tags=["math", "logic", "calculation", "default"]
+            ),
+            ModelInfo(
+                id="nvidia/nemotron-3-ultra-550b-a55b",
+                name="Nemotron 3 Ultra 550B",
+                provider="NVIDIA NIM",
+                description="Massive 550B parameter frontier model engineered for deep academic synthesis, history, cosmology, and complex conceptual analysis.",
+                category="Frontier Synthesis",
+                context_length=128000,
+                is_available=True,
+                is_default=True,
+                tags=["frontier", "synthesis", "knowledge", "deep-thought", "default"]
             ),
             ModelInfo(
                 id="nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
                 name="Nemotron Nano Omni",
                 provider="NVIDIA NIM",
-                description="Deep reasoning model with step-by-step thinking traces for scientific queries, empirical hypotheses, and proofs.",
+                description="Deep scientific deduction model that exposes step-by-step thinking traces for physics, chemistry, biology, and hypothesis testing.",
                 category="Scientific Reasoning",
                 context_length=128000,
                 is_available=True,
                 is_default=False,
-                tags=["scientific_reasoning", "reasoning", "stem"]
+                tags=["science", "physics", "chemistry", "reasoning"]
             ),
             ModelInfo(
                 id="nvidia/nemotron-3.5-super-vl-120b-a12b",
                 name="Nemotron Super VL 120B",
                 provider="NVIDIA NIM",
-                description="High-capacity 120B multimodal model capable of deep engineering analysis, robotics logic, and technical systems.",
-                category="Engineering & Robotics",
+                description="Specialized 120B model for robotics control systems, electrical engineering, mechatronics, sensor fusion, and hardware CAD.",
+                category="Robotics & Engineering",
                 context_length=128000,
                 is_available=True,
                 is_default=False,
-                tags=["robotics_engineering", "engineering", "multimodal"]
+                tags=["robotics", "engineering", "hardware", "cad"]
             ),
             ModelInfo(
-                id="meta/muse-glimmer-30b",
-                name="Meta Muse Glimmer 30B",
+                id="nvidia/riva-translate-4b-instruct-v2",
+                name="Riva Translate 4B",
                 provider="NVIDIA NIM",
-                description="Creative intelligence model excelling in stylistic variety, metaphor, narrative fiction, and nuanced dialogue.",
-                category="Creative Synthesis",
+                description="NVIDIA Riva dedicated translation engine for high-precision cross-lingual translation, localization, and linguistic analysis.",
+                category="Translation & Linguistics",
+                context_length=32000,
+                is_available=True,
+                is_default=False,
+                tags=["translation", "languages", "multilingual", "linguistics"]
+            ),
+            ModelInfo(
+                id="minimaxai/minimax-m3.1-flash",
+                name="MiniMax M3.1 Flash",
+                provider="NVIDIA NIM",
+                description="Creative intelligence model tailored for literary prose, character dialogues, poetic metaphors, narrative fiction, and copywriting.",
+                category="Creative Writing",
                 context_length=128000,
                 is_available=True,
                 is_default=False,
-                tags=["creative", "synthesis", "knowledge"]
+                tags=["creative", "writing", "story", "poem", "fiction"]
+            ),
+            ModelInfo(
+                id="nvidia/nemotron-3.5-bolt-e4b",
+                name="Nemotron 3.5 Bolt",
+                provider="NVIDIA NIM",
+                description="Sub-second low-latency engine built for rapid conversation, executive summaries, quick factual lookups, and fast turnaround.",
+                category="Fast & Lightweight",
+                context_length=64000,
+                is_available=True,
+                is_default=False,
+                tags=["fast", "speed", "summary", "general"]
             ),
         ]
         for m in models:

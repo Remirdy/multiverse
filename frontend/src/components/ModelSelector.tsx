@@ -1,5 +1,5 @@
 import React from 'react';
-import { Check, X, Layers, Sparkles, Code2, Calculator, Atom, Info } from 'lucide-react';
+import { Check, X, Layers, Sparkles, Code2, Calculator, Atom, Languages, Cpu, Info } from 'lucide-react';
 import { ModelInfo } from '../types';
 
 interface ModelSelectorProps {
@@ -23,49 +23,62 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
 }) => {
   if (!isOpen) return null;
 
-  // Preset definitions using verified active models
+  // Domain-specialized preset definitions
   const presets = [
     {
-      label: 'Balanced Trio',
+      label: 'Specialist Trio',
       icon: Sparkles,
       ids: [
-        'nvidia/nemotron-3.5-lightning-30b-a3b',
-        'mistralai/mistral-large-4-1t-a52b',
         'poolside/laguna-xs-2.1',
+        'nvidia/nemotron-3.5-lightning-30b-a3b',
+        'nvidia/nemotron-3-ultra-550b-a55b',
       ],
     },
     {
-      label: 'Code & Logic',
+      label: 'Coding & Dev',
       icon: Code2,
       ids: [
         'poolside/laguna-xs-2.1',
         'nvidia/nemotron-3.5-lightning-30b-a3b',
-        'nvidia/nemotron-3.5-bolt-e4b',
       ],
     },
     {
-      label: 'STEM & Math',
+      label: 'Math & Logic',
       icon: Calculator,
       ids: [
         'nvidia/nemotron-3.5-lightning-30b-a3b',
         'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning',
-        'nvidia/nemotron-3.5-super-vl-120b-a12b',
       ],
     },
     {
-      label: 'Frontier Scale',
+      label: 'Deep Science & 550B',
       icon: Atom,
       ids: [
+        'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning',
+        'nvidia/nemotron-3-ultra-550b-a55b',
+      ],
+    },
+    {
+      label: 'Robotics & Hardware',
+      icon: Cpu,
+      ids: [
         'nvidia/nemotron-3.5-super-vl-120b-a12b',
-        'mistralai/mistral-large-4-1t-a52b',
-        'meta/muse-glimmer-30b',
+        'nvidia/nemotron-3.5-bolt-e4b',
+      ],
+    },
+    {
+      label: 'Translation & Literature',
+      icon: Languages,
+      ids: [
+        'nvidia/riva-translate-4b-instruct-v2',
+        'minimaxai/minimax-m3.1-flash',
       ],
     },
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-fadeIn">
-      <div className="relative w-full max-w-3xl max-h-[85vh] flex flex-col rounded-2xl bg-space-900 border border-slate-800 shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-fadeIn">
+      <div className="relative w-full max-w-4xl max-h-[85vh] flex flex-col rounded-2xl bg-space-900 border border-slate-800 shadow-2xl overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-space-850/60">
           <div className="flex items-center gap-3">
@@ -73,9 +86,9 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
               <Layers className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-base font-semibold text-slate-100">AI Model Registry</h2>
+              <h2 className="text-base font-semibold text-slate-100">Specialized AI Model Registry</h2>
               <p className="text-xs text-slate-400">
-                Select between 1 and {maxModels} models to compare concurrently ({selectedModelIds.length}/{maxModels} selected)
+                Choose specialized models tailored by domain ({selectedModelIds.length}/{maxModels} selected)
               </p>
             </div>
           </div>
@@ -88,8 +101,8 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
         </div>
 
         {/* Quick Presets Bar */}
-        <div className="flex items-center gap-2 px-6 py-3 border-b border-slate-800/80 bg-space-950/40 overflow-x-auto">
-          <span className="text-xs font-medium text-slate-400 shrink-0 mr-1">Presets:</span>
+        <div className="flex items-center gap-2 px-6 py-3 border-b border-slate-800/80 bg-space-950/40 overflow-x-auto custom-scrollbar">
+          <span className="text-xs font-medium text-slate-400 shrink-0 mr-1">Domains:</span>
           {presets.map((preset) => {
             const Icon = preset.icon;
             const isCurrent =
@@ -114,7 +127,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
 
         {/* Model Cards Grid */}
         <div className="flex-1 overflow-y-auto p-6 space-y-3 custom-scrollbar">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
             {models.map((model) => {
               const isSelected = selectedModelIds.includes(model.id);
               const isDisabled = !isSelected && selectedModelIds.length >= maxModels;
@@ -127,9 +140,9 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
                   }}
                   className={`relative flex flex-col p-4 rounded-xl border transition-all cursor-pointer ${
                     isSelected
-                      ? 'bg-brand-indigo/10 border-cyan-500/60 shadow-md shadow-cyan-950/20'
+                      ? 'bg-brand-indigo/15 border-cyan-500/70 shadow-md shadow-cyan-950/30'
                       : isDisabled
-                      ? 'bg-space-950/40 border-slate-800/40 opacity-50 cursor-not-allowed'
+                      ? 'bg-space-950/40 border-slate-800/40 opacity-45 cursor-not-allowed'
                       : 'bg-space-850/70 border-slate-800 hover:border-slate-700 hover:bg-space-800/60'
                   }`}
                 >
@@ -140,8 +153,8 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
                           {model.name}
                         </span>
                         {model.is_default && (
-                          <span className="text-[10px] bg-slate-800 text-cyan-400 border border-cyan-800/50 px-1.5 py-0.2 rounded font-medium">
-                            Default
+                          <span className="text-[10px] bg-cyan-950/70 text-cyan-300 border border-cyan-800/60 px-1.5 py-0.2 rounded font-medium">
+                            Specialist Pick
                           </span>
                         )}
                       </div>
@@ -167,7 +180,9 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
                   </p>
 
                   <div className="flex items-center justify-between text-[11px] text-slate-500 pt-2 border-t border-slate-800/80 mt-auto">
-                    <span className="text-slate-400 font-medium">{model.category}</span>
+                    <span className="text-cyan-400/90 font-medium px-2 py-0.5 rounded bg-space-900 border border-slate-800">
+                      {model.category}
+                    </span>
                     <span className="font-mono text-slate-400">
                       {(model.context_length / 1000).toFixed(0)}k ctx
                     </span>
@@ -182,7 +197,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
         <div className="flex items-center justify-between px-6 py-4 border-t border-slate-800 bg-space-850/80">
           <div className="flex items-center gap-2 text-xs text-slate-400">
             <Info className="w-4 h-4 text-cyan-400 shrink-0" />
-            <span>NVIDIA NIM endpoints queried concurrently via unified backend architecture.</span>
+            <span>Each model is chosen strictly for its verified benchmark domain specialization.</span>
           </div>
           <button
             onClick={onClose}

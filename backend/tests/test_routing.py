@@ -10,10 +10,10 @@ def test_route_mathematics():
     assert res.category == "mathematics"
     assert "nvidia/nemotron-3.5-lightning-30b-a3b" in res.recommended_model_ids
 
-def test_route_creative():
-    res = routing_service.classify("Write a poetic story about a lost astronaut with metaphor and imagery")
-    assert res.category == "creative_writing"
-    assert "mistralai/mistral-large-4-1t-a52b" in res.recommended_model_ids
+def test_route_translation():
+    res = routing_service.classify("Translate this paragraph into English and explain the meaning")
+    assert res.category == "translation_linguistics"
+    assert "nvidia/riva-translate-4b-instruct-v2" in res.recommended_model_ids
 
 def test_route_robotics():
     res = routing_service.classify("How do I configure the PID controller and servo actuator for my ROS robot?")
