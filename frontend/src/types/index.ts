@@ -107,3 +107,10 @@ export interface ProviderHealth {
   base_url: string;
   api_key_set: boolean;
 }
+
+export interface EnhancePromptResponse {
+  original_prompt: string;
+  enhanced_prompt: string;
+  latency_ms: number;
+  model_used: string;
+}

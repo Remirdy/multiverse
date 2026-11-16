@@ -50,6 +50,10 @@ export const translations = {
     visionModeActive: '👁️ Görsel Algılama Modu: Devre şemaları ve fotoğraflar için Vision modelleri (Nemotron Super VL & Llama 3.2 Vision) otomatik seçildi.',
     visionOnlyTab: '👁️ Görsel & Şema (Vision)',
     allModelsTab: 'Tüm Modeller',
+    enhancePromptBtn: '✨ Promptu Güçlendir',
+    enhancingPrompt: 'Güçlendiriliyor...',
+    enhancedNotice: '✨ Prompt NVIDIA AI ile güçlendirildi',
+    undoEnhance: 'Geri Al',
     footerInfo: 'NVIDIA Build NIM Çoklu Model Altyapısı',
 
     // Comparison Card & Grid
@@ -129,6 +133,10 @@ export const translations = {
     visionModeActive: '👁️ Vision Mode Active: Vision models (Nemotron Super VL & Llama 3.2 Vision) auto-selected for circuit schematics & photos.',
     visionOnlyTab: '👁️ Vision & Schematics',
     allModelsTab: 'All Models',
+    enhancePromptBtn: '✨ Enhance Prompt',
+    enhancingPrompt: 'Enhancing...',
+    enhancedNotice: '✨ Prompt enhanced with NVIDIA AI',
+    undoEnhance: 'Undo',
     footerInfo: 'NVIDIA Build NIM Multi-Model Engine',
 
     // Comparison Card & Grid

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Layers, Sparkles, SlidersHorizontal, Paperclip, FileText, Image as ImageIcon, X, Loader2 } from 'lucide-react';
+import { Send, Layers, Sparkles, SlidersHorizontal, Paperclip, FileText, Image as ImageIcon, X, Loader2, Wand2, RotateCcw } from 'lucide-react';
 import { ModelInfo, AttachmentItem } from '../types';
 import { api } from '../services/api';
 import { useLanguage } from '../i18n/LanguageContext';
@@ -23,13 +23,17 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   onAddVisionModel,
   onAutoSelectVisionModels,
 }) => {
-  const { t } = useLanguage();
+  const { language, t } = useLanguage();
   const [prompt, setPrompt] = useState('');
   const [systemPrompt, setSystemPrompt] = useState('');
   const [showSystemPrompt, setShowSystemPrompt] = useState(false);
   const [attachments, setAttachments] = useState<AttachmentItem[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [isEnhancing, setIsEnhancing] = useState(false);
+  const [originalPromptBackup, setOriginalPromptBackup] = useState<string | null>(null);
+  const [showEnhancedBadge, setShowEnhancedBadge] = useState(false);
+  const [enhancedLatency, setEnhancedLatency] = useState<number | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -44,8 +48,44 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const val = e.target.value;
     setPrompt(val);
+    if (showEnhancedBadge) {
+      setShowEnhancedBadge(false);
+    }
     if (onPromptChange) {
       onPromptChange(val);
+    }
+  };
+
+  const handleEnhancePrompt = async () => {
+    if (!prompt.trim() || isEnhancing || isLoading) return;
+    setIsEnhancing(true);
+
+    try {
+      const res = await api.enhancePrompt(prompt.trim(), language);
+      if (res && res.enhanced_prompt) {
+        setOriginalPromptBackup(prompt);
+        setPrompt(res.enhanced_prompt);
+        setEnhancedLatency(res.latency_ms);
+        setShowEnhancedBadge(true);
+        if (onPromptChange) {
+          onPromptChange(res.enhanced_prompt);
+        }
+      }
+    } catch (err: any) {
+      console.error('Enhance prompt failed:', err);
+    } finally {
+      setIsEnhancing(false);
+    }
+  };
+
+  const handleUndoEnhance = () => {
+    if (originalPromptBackup) {
+      setPrompt(originalPromptBackup);
+      if (onPromptChange) {
+        onPromptChange(originalPromptBackup);
+      }
+      setShowEnhancedBadge(false);
+      setOriginalPromptBackup(null);
     }
   };
 
@@ -112,6 +152,8 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 
     setPrompt('');
     setAttachments([]);
+    setShowEnhancedBadge(false);
+    setOriginalPromptBackup(null);
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
     }
@@ -289,6 +331,27 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           </div>
         )}
 
+        {/* Enhanced Prompt Notification Banner */}
+        {showEnhancedBadge && (
+          <div className="flex items-center justify-between gap-2 px-3.5 py-1.5 bg-gradient-to-r from-purple-950/70 via-indigo-950/50 to-space-900 border-b border-purple-800/40 text-[11px] text-purple-200 animate-fadeIn">
+            <div className="flex items-center gap-1.5 truncate">
+              <Sparkles className="w-3.5 h-3.5 text-purple-400 shrink-0" />
+              <span>{t.enhancedNotice} {enhancedLatency ? `(~${(enhancedLatency / 1000).toFixed(1)}s)` : ''}</span>
+            </div>
+            {originalPromptBackup && (
+              <button
+                type="button"
+                onClick={handleUndoEnhance}
+                className="flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-purple-500/20 hover:bg-purple-500/30 border border-purple-400/40 text-purple-300 font-medium text-[11px] shrink-0 transition-colors"
+                title="Orijinal prompta geri dön"
+              >
+                <RotateCcw className="w-3 h-3" />
+                <span>{t.undoEnhance}</span>
+              </button>
+            )}
+          </div>
+        )}
+
         {/* Text Input Area & Action Buttons */}
         <div className="flex items-end gap-2 p-3">
           {/* File Upload Trigger Button */}
@@ -316,6 +379,33 @@ export const ChatInput: React.FC<ChatInputProps> = ({
             disabled={isLoading}
             className="flex-1 bg-transparent text-sm text-slate-100 placeholder-slate-500 resize-none focus:outline-none min-h-[44px] max-h-[180px] py-2 px-1 leading-relaxed custom-scrollbar"
           />
+
+          {/* Magic Prompt Enhancer Button */}
+          {prompt.trim().length > 3 && (
+            <button
+              type="button"
+              onClick={handleEnhancePrompt}
+              disabled={isEnhancing || isLoading}
+              className={`flex items-center gap-1.5 px-3 h-10 rounded-xl text-xs font-medium transition-all shrink-0 active:scale-95 border ${
+                isEnhancing
+                  ? 'bg-purple-950/80 text-purple-300 border-purple-700/60 animate-pulse'
+                  : 'bg-purple-950/50 hover:bg-purple-900/60 text-purple-300 hover:text-purple-100 border-purple-700/50 hover:border-purple-500/70 shadow-sm shadow-purple-950/40'
+              }`}
+              title={t.enhancePromptBtn}
+            >
+              {isEnhancing ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-purple-400" />
+                  <span className="hidden md:inline text-[11px]">{t.enhancingPrompt}</span>
+                </>
+              ) : (
+                <>
+                  <Wand2 className="w-3.5 h-3.5 text-purple-400" />
+                  <span className="hidden sm:inline text-[11px] font-semibold">{t.enhancePromptBtn}</span>
+                </>
+              )}
+            </button>
+          )}
 
           <button
             type="submit"

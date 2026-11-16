@@ -109,11 +109,23 @@ class ApiClient {
     });
   }
 
-  // Routing
+  // Routing & Prompt Enhancement
   async routePrompt(prompt: string): Promise<RouteResponse> {
     return this.request<RouteResponse>('/route', {
       method: 'POST',
       body: JSON.stringify({ prompt }),
+    });
+  }
+
+  async enhancePrompt(prompt: string, language: string = 'tr'): Promise<{
+    original_prompt: string;
+    enhanced_prompt: string;
+    latency_ms: number;
+    model_used: string;
+  }> {
+    return this.request('/route/enhance', {
+      method: 'POST',
+      body: JSON.stringify({ prompt, language }),
     });
   }
 }
