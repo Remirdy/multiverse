@@ -119,9 +119,9 @@ class NvidiaProvider(BaseProvider):
         else:
             messages.append({"role": "user", "content": effective_prompt})
 
-        # Generous limits for multi-problem visual exam and schematic solving
-        effective_max_tokens = 4096 if is_vision else 3072
-        effective_timeout = max(timeout or 90.0, 120.0) if is_vision else (timeout or 90.0)
+        # Generous limits for multi-problem visual exam, deep reasoning, and long tables
+        effective_max_tokens = 8192
+        effective_timeout = max(timeout or 90.0, 120.0)
 
         start_time = time.perf_counter()
 

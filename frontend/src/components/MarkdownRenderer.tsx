@@ -78,6 +78,17 @@ function preprocessLaTeX(content: string): string {
     text = text.trimEnd() + '$';
   }
 
+  // 9. Fix dangling unclosed markdown brackets or bold markers at the end of cut-off responses
+  const openBrackets = (text.match(/\[/g) || []).length;
+  const closeBrackets = (text.match(/\]/g) || []).length;
+  if (openBrackets > closeBrackets) {
+    text += ']';
+  }
+  const boldMatches = text.match(/\*\*/g);
+  if (boldMatches && boldMatches.length % 2 !== 0) {
+    text += '**';
+  }
+
   return text;
 }
 

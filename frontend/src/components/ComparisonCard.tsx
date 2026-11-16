@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Copy, Check, RotateCw, AlertTriangle, Clock, Sparkles, Brain, ChevronDown, ChevronUp } from 'lucide-react';
+import { Copy, Check, RotateCw, AlertTriangle, Clock, Sparkles, Brain, ChevronDown, ChevronUp, Maximize2, X } from 'lucide-react';
 import { ModelResult } from '../types';
 import { MarkdownRenderer } from './MarkdownRenderer';
 import { useLanguage } from '../i18n/LanguageContext';
@@ -50,6 +50,7 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
   const { t } = useLanguage();
   const [copied, setCopied] = useState(false);
   const [showReasoning, setShowReasoning] = useState(false);
+  const [isMaximized, setIsMaximized] = useState(false);
 
   const handleCopy = async () => {
     if (!result.response_text) return;
@@ -74,7 +75,7 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
         isError || isTimeout
           ? 'border-rose-900/40 hover:border-rose-700/60 shadow-rose-950/20'
           : 'border-slate-800 hover:border-slate-700/80 shadow-black/40'
-      } h-full min-h-[320px] max-h-[700px] overflow-hidden`}
+      } h-full min-h-[320px] max-h-[850px] overflow-hidden`}
     >
       {/* Card Header */}
       <div className="flex items-center justify-between px-4 py-3 bg-space-850/90 border-b border-slate-800/80 backdrop-blur-sm shrink-0">
@@ -116,23 +117,33 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
               {isTimeout ? t.timeoutTitle : t.errorTitle}
             </span>
           ) : (
-            <button
-              onClick={handleCopy}
-              className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-slate-200 transition-colors bg-space-800/80 hover:bg-space-700/80 px-2.5 py-1 rounded-lg border border-slate-700/50"
-              title={t.copy}
-            >
-              {copied ? (
-                <>
-                  <Check className="w-3.5 h-3.5 text-emerald-400" />
-                  <span className="text-emerald-400 font-medium">{t.copied}</span>
-                </>
-              ) : (
-                <>
-                  <Copy className="w-3.5 h-3.5" />
-                  <span>{t.copy}</span>
-                </>
-              )}
-            </button>
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={handleCopy}
+                className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-slate-200 transition-colors bg-space-800/80 hover:bg-space-700/80 px-2 py-1 rounded-lg border border-slate-700/50"
+                title={t.copy}
+              >
+                {copied ? (
+                  <>
+                    <Check className="w-3.5 h-3.5 text-emerald-400" />
+                    <span className="text-emerald-400 font-medium">{t.copied}</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">{t.copy}</span>
+                  </>
+                )}
+              </button>
+
+              <button
+                onClick={() => setIsMaximized(true)}
+                className="p-1 text-slate-400 hover:text-slate-200 transition-colors bg-space-800/80 hover:bg-space-700/80 rounded-lg border border-slate-700/50"
+                title="Genişlet / Tam Ekran (Tabloları ve uzun metinleri rahat incele)"
+              >
+                <Maximize2 className="w-3.5 h-3.5" />
+              </button>
+            </div>
           )}
 
           {/* Retry Button if failed or timeout */}
@@ -215,6 +226,76 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
           </div>
         )}
       </div>
+
+      {/* Maximized Fullscreen Modal */}
+      {isMaximized && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-md animate-fadeIn">
+          <div className="relative w-full max-w-5xl h-[92vh] flex flex-col rounded-2xl bg-space-900 border border-slate-700 shadow-2xl overflow-hidden">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between px-6 py-4 bg-space-850 border-b border-slate-800">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-space-800 border border-slate-700/60 text-cyan-400">
+                  <Sparkles className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-base font-bold text-slate-100">{result.model_name}</h3>
+                    <span className="text-[10px] uppercase font-semibold text-slate-400 px-2 py-0.5 rounded bg-space-800 border border-slate-700/60">
+                      {result.provider}
+                    </span>
+                  </div>
+                  {result.response_time_ms != null && (
+                    <span className="text-xs text-slate-400">
+                      {Math.round(result.response_time_ms).toLocaleString()} ms yanıt süresi
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleCopy}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-space-800 hover:bg-space-700 border border-slate-700 text-xs text-slate-200 transition-colors"
+                >
+                  {copied ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 text-emerald-400" />
+                      <span className="text-emerald-400 font-medium">{t.copied}</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5" />
+                      <span>{t.copy}</span>
+                    </>
+                  )}
+                </button>
+
+                <button
+                  onClick={() => setIsMaximized(false)}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-space-800 transition-colors"
+                  title="Kapat"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Content */}
+            <div className="flex-1 p-6 md:p-8 overflow-y-auto custom-scrollbar leading-relaxed">
+              {thinking && (
+                <div className="mb-6 rounded-xl border border-cyan-800/40 bg-space-950/70 p-4 text-xs text-slate-300">
+                  <div className="font-semibold text-cyan-300 mb-2 flex items-center gap-2">
+                    <Brain className="w-4 h-4 text-cyan-400" />
+                    <span>{t.reasoningProcess}</span>
+                  </div>
+                  <MarkdownRenderer content={thinking} />
+                </div>
+              )}
+              <MarkdownRenderer content={solution} />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
