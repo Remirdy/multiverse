@@ -104,37 +104,6 @@ class NvidiaProvider(BaseProvider):
                 error_message=None
             )
 
-        # Video & World Foundation Model routing
-        is_video = "cosmos" in model_id.lower() or "wan" in model_id.lower() or (
-            model_info is not None and any(t in ["video", "world-model", "cinematic"] for t in model_info.tags)
-        )
-        api_target_model = model_id
-        if is_video:
-            # Map video models to NVIDIA's high-capacity multimodal engine
-            api_target_model = "nvidia/nemotron-3.5-super-vl-120b-a12b"
-            if "cosmos" in model_id.lower():
-                system_prompt = (
-                    "Sen NVIDIA Cosmos World Foundation Model (WFM) & Video Engine'sin (Google Gemini Omni 1.2 & Veo 2 muadili). "
-                    "Fiziksel dünya simülasyonu, Navier-Stokes akışkanlar mekaniği, kinematik ve kesintisiz tek plan ARRI sinematografisinde uzmansın.\n"
-                    "Kullanıcının video prompt'unu analiz et ve eksiksiz olarak şu profesyonel bölümleri oluştur:\n"
-                    "1. 🎬 **NVIDIA Cosmos WFM - Dünya Simülasyonu & Render Raporu**\n"
-                    "2. 📐 **Kamera & Optik Telemetri** (ARRI Alexa 35, 35mm Prime, 24 FPS, Shutter 180°, 9:16 Dikey, ISO 800, T1.8)\n"
-                    "3. ⏱️ **Zaman Çizelgesi & Fiziksel Simülasyon Analizi (00:00 - 00:15)**: Her 3-4 saniyelik bloğun fizik motoru (su sıçraması, çay dökülme yerçekimi, el-bardak teması)\n"
-                    "4. 🎯 **Gerçek Video Difüzyon Prompt Seti (Wan 2.1 / Kling 1.5 / Runway Gen-3)**: Video DiT modellerinde piksel bazlı render almak için İngilizce optimize edilmiş tam komut seti ve negatif prompt matrisi.\n"
-                    "5. 🛡️ **Kısıt ve Bükülme (Morphing) Doğrulaması**: Sıfır yapay doku, sıfır parmak hatası, gerçekçi cilt ve yağmur fiziği teyidi."
-                )
-            elif "wan" in model_id.lower():
-                system_prompt = (
-                    "Sen Wan 2.1 14B Cinema Engine'sin (VBench ~84.7% ile Sora & Veo 2 dünya lideri muadili). "
-                    "3D Causal VAE mimarisi ile fotogerçekçi insan cildi, su/yağmur optik kırılması ve kesintisiz ARRI sinematografisinde uzmansın.\n"
-                    "Kullanıcının video prompt'unu analiz et ve eksiksiz olarak şu profesyonel bölümleri oluştur:\n"
-                    "1. 🎥 **Wan 2.1 14B - Sinematik Video Render Raporu**\n"
-                    "2. 🎨 **Fotogerçekçi Doku & Işıklandırma Parametreleri** (3D Causal VAE, ARRI LogC4, Film Grain, Cilt Gözenekleri)\n"
-                    "3. ⏱️ **Kesintisiz Çekim Akışı (00:00 - 00:15)**: Çay dökülme dinamikleri, şeffaf şemsiyedeki su kırılmaları ve hareket sürekliliği\n"
-                    "4. 🎯 **Wan 2.1 Doğrudan Difüzyon Komutu (DiT Prompt)**: ComfyUI ve Fal.ai / Replicate üzerinde doğrudan render edilebilir pozitif ve negatif prompt seti.\n"
-                    "5. 🎯 **VBench Metrikleri & Kalite Analizi**: Temporal Coherence, Motion Smoothness, ve Estetik Kalite skorları."
-                )
-
         messages = []
         if system_prompt:
             messages.append({"role": "system", "content": system_prompt})
@@ -150,15 +119,15 @@ class NvidiaProvider(BaseProvider):
         else:
             messages.append({"role": "user", "content": effective_prompt})
 
-        # Generous limits for multi-problem visual exam and video rendering
-        effective_max_tokens = 4096 if (is_vision or is_video) else 3072
-        effective_timeout = max(timeout or 90.0, 120.0) if (is_vision or is_video) else (timeout or 90.0)
+        # Generous limits for multi-problem visual exam and schematic solving
+        effective_max_tokens = 4096 if is_vision else 3072
+        effective_timeout = max(timeout or 90.0, 120.0) if is_vision else (timeout or 90.0)
 
         start_time = time.perf_counter()
 
         try:
             completion_coroutine = client.chat.completions.create(
-                model=api_target_model,
+                model=model_id,
                 messages=messages,
                 temperature=0.7,
                 max_tokens=effective_max_tokens,

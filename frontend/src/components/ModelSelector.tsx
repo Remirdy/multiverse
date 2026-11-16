@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Check, X, Layers, Sparkles, Code2, Atom, Zap, Info, Eye, Film } from 'lucide-react';
+import { Check, X, Layers, Sparkles, Code2, Atom, Zap, Info, Eye } from 'lucide-react';
 import { ModelInfo } from '../types';
 import { useLanguage } from '../i18n/LanguageContext';
 
@@ -23,26 +23,18 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
   maxModels = 6,
 }) => {
   const { language, t } = useLanguage();
-  const [filterTag, setFilterTag] = useState<'all' | 'vision' | 'video' | 'code' | 'math'>('all');
+  const [filterTag, setFilterTag] = useState<'all' | 'vision' | 'code' | 'math'>('all');
 
   if (!isOpen) return null;
 
   // Presets mapping directly to real NVIDIA NIM model IDs
   const presets = language === 'en' ? [
     {
-      label: '🎬 Video & World (Cosmos + Wan 2.1)',
-      icon: Film,
-      ids: [
-        'nvidia/cosmos-predict1-7b',
-        'wan-video/wan-2.1-14b',
-      ],
-    },
-    {
       label: 'Circuit & Vision Only (4-Argon & Llama)',
       icon: Eye,
       ids: [
         'nvidia/nemotron-3.5-super-vl-120b-a12b',
-        'nvidia/cosmos-predict1-7b',
+        'meta/llama-3.2-90b-vision-instruct',
       ],
     },
     {
@@ -80,19 +72,11 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
     },
   ] : [
     {
-      label: '🎬 Video & Dünya Modeli (Cosmos & Wan)',
-      icon: Film,
-      ids: [
-        'nvidia/cosmos-predict1-7b',
-        'wan-video/wan-2.1-14b',
-      ],
-    },
-    {
       label: '👁️ Devre & Görsel Modelleri (Vision)',
       icon: Eye,
       ids: [
         'nvidia/nemotron-3.5-super-vl-120b-a12b',
-        'nvidia/cosmos-predict1-7b',
+        'meta/llama-3.2-90b-vision-instruct',
       ],
     },
     {
@@ -132,7 +116,6 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
 
   const filteredModels = models.filter((m) => {
     if (filterTag === 'vision') return m.id.includes('vl') || m.id.includes('vision') || m.tags.includes('vision');
-    if (filterTag === 'video') return m.id.includes('cosmos') || m.id.includes('wan') || m.tags.includes('video') || m.tags.includes('world-model');
     if (filterTag === 'code') return m.tags.includes('code') || m.tags.includes('programming');
     if (filterTag === 'math') return m.tags.includes('math') || m.tags.includes('logic');
     return true;
@@ -212,17 +195,6 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
             <span>{language === 'en' ? '👁️ Vision Only' : '👁️ Vision / Devre'}</span>
           </button>
 
-          <button
-            onClick={() => setFilterTag('video')}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-lg font-medium transition-colors ${
-              filterTag === 'video'
-                ? 'bg-purple-950/60 text-purple-300 border border-purple-700/60 shadow-sm'
-                : 'text-purple-400/80 hover:text-purple-300 hover:bg-space-850'
-            }`}
-          >
-            <Film className="w-3.5 h-3.5" />
-            <span>{language === 'en' ? '🎬 Video & World (Cosmos & Wan)' : '🎬 Video & Dünya Modelleri'}</span>
-          </button>
 
           <button
             onClick={() => setFilterTag('code')}
