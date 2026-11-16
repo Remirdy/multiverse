@@ -1,17 +1,62 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
 import { CodeBlock } from './CodeBlock';
 
 interface MarkdownRendererProps {
   content: string;
 }
 
+/**
+ * Preprocesses LaTeX equations produced by LLMs to ensure standard KaTeX parsing:
+ * - Normalizes \[ ... \] to $$ ... $$ (display math)
+ * - Normalizes \( ... \) to $ ... $ (inline math)
+ * - Converts raw bracketed matrix environments [ U = \begin{pmatrix} ... \end{pmatrix} ] to $$ ... $$
+ * - Wraps naked LaTeX environments in $$ ... $$
+ * - Fixes single-backslash row breaks in matrices to \\
+ */
+function preprocessLaTeX(content: string): string {
+  if (!content) return '';
+
+  // 1. Convert \[ ... \] to $$ ... $$
+  let text = content.replace(/\\\[([\s\S]*?)\\\]/g, (_, math) => `\n\n$$\n${math.trim()}\n$$\n\n`);
+
+  // 2. Convert \( ... \) to $ ... $
+  text = text.replace(/\\\(([\s\S]*?)\\\)/g, (_, math) => `$${math.trim()}$`);
+
+  // 3. Convert bracketed math expressions like [ U = \begin{pmatrix} ... \end{pmatrix} ... ]
+  text = text.replace(
+    /\[\s*([a-zA-Z0-9_+\-*=^/\{\}\s\.,&\\()]*?\\begin\{(?:pmatrix|matrix|bmatrix|vmatrix|Vmatrix|cases|aligned|align|gather)\}[\s\S]*?\\end\{(?:pmatrix|matrix|bmatrix|vmatrix|Vmatrix|cases|aligned|align|gather)\}[\s\S]*?)\s*\]/g,
+    (_, math) => `\n\n$$\n${math.trim()}\n$$\n\n`
+  );
+
+  // 4. Wrap any naked \begin{pmatrix} ... \end{pmatrix} not already inside $$
+  text = text.replace(
+    /(?<!\$\$[\s\S]*?)(\\begin\{(?:pmatrix|matrix|bmatrix|vmatrix|Vmatrix|cases|aligned|align|gather)\}[\s\S]*?\\end\{(?:pmatrix|matrix|bmatrix|vmatrix|Vmatrix|cases|aligned|align|gather)\})/g,
+    (match) => `\n\n$$\n${match.trim()}\n$$\n\n`
+  );
+
+  // 5. Fix single backslash row separators inside matrix blocks: "\ " -> "\\ "
+  text = text.replace(
+    /(\\begin\{(?:pmatrix|matrix|bmatrix|vmatrix|Vmatrix)\}[\s\S]*?\\end\{(?:pmatrix|matrix|bmatrix|vmatrix|Vmatrix)\})/g,
+    (match) => {
+      return match.replace(/\\\s+(?=\\frac|[-0-9a-zA-Z\\])/g, '\\\\ ');
+    }
+  );
+
+  return text;
+}
+
 export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
+  const normalizedContent = useMemo(() => preprocessLaTeX(content), [content]);
+
   return (
     <div className="prose prose-invert prose-sm max-w-none text-slate-200 leading-relaxed space-y-2">
       <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
+        remarkPlugins={[remarkGfm, [remarkMath, { singleDollarTextMath: true }]]}
+        rehypePlugins={[[rehypeKatex, { output: 'htmlAndMathml', throwOnError: false }]]}
         components={{
           code({ inline, className, children, ...props }: any) {
             const match = /language-(\w+)/.exec(className || '');
@@ -85,7 +130,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) =
           }
         }}
       >
-        {content}
+        {normalizedContent}
       </ReactMarkdown>
     </div>
   );
