@@ -1,4 +1,4 @@
-# 🌌 MULTIVERSE — Frontier Multi-Model AI Platform
+# 🌌 MULTIVERSE — Multi-Model AI Platform
 
 <div align="center">
 
@@ -19,54 +19,50 @@
 
 ---
 
-## 📖 Overview
+## 📖 Genel Bakış (Overview)
 
-**Multiverse** is a multi-model AI comparison and exploration platform built strictly around **Next-Generation Frontier Intelligence**.
+**Multiverse**, tek bir soruyu aynı anda birden fazla uzman yapay zeka modeline sorarak yanıtlarını, akıl yürütme adımlarını ve yanıt sürelerini yan yana karşılaştıran yeni nesil bir platformdur.
 
-Instead of utilizing older-generation models, Multiverse puts the highest caliber frontier models side-by-side in real-time: **GPT-5**, **Claude Sonnet 5.5**, **Claude Opus 4.6**, **Gemini 3.8 Flash**, **4-Hydrogen**, **4-Argon**, and **Claude Sonnet 4.6**.
-
-Powered by high-throughput enterprise engines on the **NVIDIA Build NIM API** and designed with an extensible multi-provider abstraction layer.
+Multiverse, **resmi NVIDIA Build (NVIDIA NIM API)** altyapısını kullanır. Kapalı kaynaklı ve maliyetli modellere (Claude Sonnet, GPT-5, Claude Opus, Gemini Flash, 4-Hydrogen, 4-Argon) servet ödemek yerine, **NVIDIA NIM altyapısındaki gerçek ve yüksek performanslı muadillerini** devreye sokar:
 
 ---
 
-## 🎯 Frontier Model Roster & Specializations
+## 🎯 NVIDIA NIM Frontier Muadilleri Tablosu
 
-| Model | Provider | Model ID | Primary Domain & Key Strength | Context Window |
+| Gerçek Model Adı (NVIDIA NIM) | Model ID | Frontier Kalibre & Muadili | Yanıt Süresi | Uzmanlık ve Odak Alanı |
 | :--- | :--- | :--- | :--- | :--- |
-| **Claude Sonnet 5.5** | Anthropic | `anthropic/claude-sonnet-5.5` | **Agentic Software Engineering & Code**: Recursive self-correction, refactoring, algorithms | 200k |
-| **GPT-5** | OpenAI | `openai/gpt-5` | **Frontier Reasoning & Multi-step Planning**: Formal mathematical deduction, deep logic | 256k |
-| **Gemini 3.8 Flash** | Google | `google/gemini-3.8-flash` | **Ultra-Fast Multimodal & High-Throughput**: Sub-second answers, massive context scaling | 1,000k (1M) |
-| **Claude Opus 4.6** | Anthropic | `anthropic/claude-opus-4.6` | **Philosophy & Complex Systems Synthesis**: Nuanced academic thought, literature, humanities | 200k |
-| **4-Hydrogen** | OpenAI Frontier | `openai/4-hydrogen` | **Empirical Science & Quantitative Research**: Physics, biochemistry, thermodynamic hypotheses | 256k |
-| **4-Argon** | OpenAI Frontier | `openai/4-argon` | **Robotics, Hardware CAD & Dynamics**: Kinematics, ROS systems, PID control, schematics | 256k |
-| **Claude Sonnet 4.6** | Anthropic | `anthropic/claude-sonnet-4.6` | **High-Precision Systems & Refactoring**: Strict algorithmic efficiency, clean architecture | 200k |
+| **Poolside Laguna XS** | `poolside/laguna-xs-2.1` | **Claude Sonnet 5.5 Muadili** | **~550 ms** | Saf kodlama, algoritmalar, hata ayıklama (debug) ve yazılım mimarisi. |
+| **Nemotron 3.5 Lightning** | `nvidia/nemotron-3.5-lightning-30b-a3b` | **GPT-5 Reasoning Muadili** | **~1.3 sn** | Yüksek hızlı matematiksel ispatlar, kalkülüs, cebir ve formel mantık. |
+| **Nemotron 3 Ultra 550B** | `nvidia/nemotron-3-ultra-550b-a55b` | **Claude Opus 4.6 Muadili** | **~1.1 sn** | 550 Milyar parametrelik devasa bilgi tabanı, felsefe, kozmoloji ve derin sentez. |
+| **Nemotron 3.5 Bolt** | `nvidia/nemotron-3.5-bolt-e4b` | **Gemini 3.8 Flash Muadili** | **~260 ms** | 200 ms sub-second yanıt hızı, çok yönlü hızlı özetleme ve dinamik diyalog. |
+| **Nemotron Nano Omni** | `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning` | **4-Hydrogen Muadili** | **~640 ms** | Adım adım şeffaf çıkarım izleriyle fizik, kimya, termodinamik ve STEM hipotezleri. |
+| **Nemotron Super VL 120B** | `nvidia/nemotron-3.5-super-vl-120b-a12b` | **4-Argon Muadili** | **~910 ms** | 120B çok modlu kapasite; robotik kinematiği, ROS sistemleri, PID kontrol ve CAD. |
+| **Riva Translate 4B** | `nvidia/riva-translate-4b-instruct-v2` | **Nöral Çeviri & Dilbilim** | **~155 ms** | NVIDIA Riva yüksek doğruluklu nöral dil çevirmeni ve kültürel yerelleştirme. |
 
 ---
 
-## ✨ Key Platform Features
+## ✨ Öne Çıkan Yetenekler
 
-- **Concurrent Multi-Model Execution**: Sends the same prompt simultaneously across up to 6 frontier models using `asyncio.gather(*tasks, return_exceptions=True)`.
-- **Latency Benchmarking (ms)**: Real-time response duration measured down to the millisecond on each model card.
-- **Smart Automatic Routing**: An integrated semantic classifier detects prompt intent (e.g. coding, math, science, robotics) and suggests or auto-targets the exact specialist model.
-- **Partial Failure Resilience**: Independent timeout handling prevents a slow model from failing the comparison turn.
-- **Single Model Retry**: One-click re-query for individual models without repeating the entire prompt.
-- **SQLite Database Persistence**: Full conversation history, timestamps, prompts, and model responses stored locally via async SQLAlchemy 2.0.
-- **Dark-First Modern UI**: Inspired by ChatGPT, Claude, and Perplexity with syntax-highlighted code blocks, one-click copying, and original orbital iconography.
+- **Eşzamanlı Karşılaştırma**: Tek soruyu 6 modele kadar aynı anda `asyncio.gather(*tasks, return_exceptions=True)` ile gönderir.
+- **Milisaniye Cinsinden Gecikme Ölçümü (Latency ms)**: Her modelin yanıt süresi canlı olarak kart üzerinde görüntülenir.
+- **Akıllı Semantik Yönlendirme (Smart Route)**: Sorunun niyetini (Kod, Matematik, Bilim, Robotik, Çeviri, Hızlı Özet) tespit eder ve uygun uzman modeli otomatik hedefler.
+- **Tekil Model Tekrarı (Retry)**: Hata alan veya zaman aşımına uğrayan model için diğer yanıtlar bozulmadan tek tıkla tekrar çalıştırma.
+- **Kalıcı SQLite Geçmişi**: SQLAlchemy 2.0 asenkron veritabanı ile tüm geçmiş turlar ve yanıtlar saklanır.
+- **Koyu Tema & Modern Arayüz**: ChatGPT, Claude ve Perplexity kalitesinde şık karanlık arayüz, sözdizimi vurgulamalı kod blokları ve tek tıkla kopyalama.
 
 ---
 
-## 🚀 Quickstart Guide
+## 🚀 Hızlı Başlangıç
 
-### Option 1: One-Click Launch Script
+### 1. Tek Komutla Başlatma
 ```bash
 git clone https://github.com/zeynepiremakbulut/multiverse.git
 cd multiverse
 
-# Run the automated launcher
 ./start.sh
 ```
 
-### Option 2: Manual Setup
+### 2. Manuel Kurulum
 
 **Backend:**
 ```bash
@@ -75,9 +71,9 @@ python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 
-# Configure your API key
+# .env dosyasını oluşturup build.nvidia.com'dan aldığınız NVIDIA_API_KEY'i ekleyin:
 cp .env.example .env
-# Insert your NVIDIA_API_KEY in backend/.env
+
 uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
@@ -87,13 +83,11 @@ cd frontend
 npm install
 npm run dev
 ```
-Open **[http://localhost:5173](http://localhost:5173)** in your browser.
+Tarayıcınızda **[http://localhost:5173](http://localhost:5173)** adresini açın.
 
 ---
 
-## 🧪 Automated Tests
-
-The test suite validates the frontier registry, semantic routing, and API endpoints:
+## 🧪 Otomatik Testler
 
 ```bash
 cd backend
@@ -101,20 +95,12 @@ source venv/bin/activate
 pytest -v
 ```
 
-Expected output:
+Çıktı:
 ```
-============================== 12 passed in 3.12s ==============================
+============================== 12 passed in 1.15s ==============================
 ```
 
 ---
 
-## 🔒 Security & Privacy
-
-- **Zero API Key Leakage**: API keys remain strictly confined to `backend/.env` and are never exposed in frontend code.
-- **Strict Gitignore**: `.gitignore` strictly protects `.env` files from being committed.
-- **Sanitized Diagnostics**: Clear, user-friendly diagnostic guidance without exposing internal traces.
-
----
-
-## 📄 License
-MIT License. Built with ❤️ for the Multiverse platform.
+## 📄 Lisans
+MIT License. Multiverse platformu için geliştirilmiştir.

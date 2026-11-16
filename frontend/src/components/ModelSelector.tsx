@@ -1,5 +1,5 @@
 import React from 'react';
-import { Check, X, Layers, Sparkles, Code2, Calculator, Cpu, BookOpen, Info } from 'lucide-react';
+import { Check, X, Layers, Sparkles, Code2, Atom, Cpu, Languages, Zap, Info } from 'lucide-react';
 import { ModelInfo } from '../types';
 
 interface ModelSelectorProps {
@@ -23,48 +23,55 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
 }) => {
   if (!isOpen) return null;
 
-  // Next-Gen Frontier Presets
+  // Presets mapping directly to real NVIDIA NIM model IDs
   const presets = [
     {
-      label: 'Flagship Trio',
+      label: 'Dengeli Üçlü (Sonnet + GPT-5 + Opus)',
       icon: Sparkles,
       ids: [
-        'anthropic/claude-sonnet-5.5',
-        'openai/gpt-5',
-        'google/gemini-3.8-flash',
+        'poolside/laguna-xs-2.1',
+        'nvidia/nemotron-3.5-lightning-30b-a3b',
+        'nvidia/nemotron-3-ultra-550b-a55b',
       ],
     },
     {
-      label: 'Next-Gen Code & Dev',
+      label: 'Kodlama (Sonnet Muadili)',
       icon: Code2,
       ids: [
-        'anthropic/claude-sonnet-5.5',
-        'anthropic/claude-sonnet-4.6',
-        'openai/gpt-5',
+        'poolside/laguna-xs-2.1',
+        'nvidia/nemotron-3.5-lightning-30b-a3b',
       ],
     },
     {
-      label: 'Deep Science & Math',
-      icon: Calculator,
+      label: 'Hızlı & Flash (Gemini Flash Muadili)',
+      icon: Zap,
       ids: [
-        'openai/gpt-5',
-        'openai/4-hydrogen',
+        'nvidia/nemotron-3.5-bolt-e4b',
+        'poolside/laguna-xs-2.1',
       ],
     },
     {
-      label: 'Systems & Robotics',
+      label: 'Derin Bilim & STEM (4-Hydrogen)',
+      icon: Atom,
+      ids: [
+        'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning',
+        'nvidia/nemotron-3-ultra-550b-a55b',
+      ],
+    },
+    {
+      label: 'Robotik & Donanım (4-Argon)',
       icon: Cpu,
       ids: [
-        'openai/4-argon',
-        'anthropic/claude-sonnet-5.5',
+        'nvidia/nemotron-3.5-super-vl-120b-a12b',
+        'nvidia/nemotron-3.5-bolt-e4b',
       ],
     },
     {
-      label: 'Philosophy & Humanities',
-      icon: BookOpen,
+      label: 'Çeviri & Dilbilim (Riva)',
+      icon: Languages,
       ids: [
-        'anthropic/claude-opus-4.6',
-        'google/gemini-3.8-flash',
+        'nvidia/riva-translate-4b-instruct-v2',
+        'nvidia/nemotron-3.5-bolt-e4b',
       ],
     },
   ];
@@ -79,9 +86,9 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
               <Layers className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-base font-semibold text-slate-100">Frontier AI Model Registry</h2>
+              <h2 className="text-base font-semibold text-slate-100">NVIDIA NIM Uzman Model Kataloğu</h2>
               <p className="text-xs text-slate-400">
-                Compare next-generation frontier intelligence models side-by-side ({selectedModelIds.length}/{maxModels} selected)
+                Frontier modellerin (Claude, GPT-5, Gemini Flash) NVIDIA NIM altyapısındaki gerçek muadilleri ({selectedModelIds.length}/{maxModels} seçili)
               </p>
             </div>
           </div>
@@ -95,7 +102,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
 
         {/* Quick Presets Bar */}
         <div className="flex items-center gap-2 px-6 py-3 border-b border-slate-800/80 bg-space-950/40 overflow-x-auto custom-scrollbar">
-          <span className="text-xs font-medium text-slate-400 shrink-0 mr-1">Presets:</span>
+          <span className="text-xs font-medium text-slate-400 shrink-0 mr-1">Ön Ayarlar:</span>
           {presets.map((preset) => {
             const Icon = preset.icon;
             const isCurrent =
@@ -145,7 +152,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
                         <span className="font-semibold text-sm text-slate-100 truncate">
                           {model.name}
                         </span>
-                        <span className="text-[10px] bg-space-800 text-slate-400 border border-slate-700/60 px-1.5 py-0.2 rounded font-mono">
+                        <span className="text-[10px] bg-cyan-950/80 text-cyan-300 border border-cyan-800/60 px-1.5 py-0.2 rounded font-mono font-medium">
                           {model.provider}
                         </span>
                       </div>
@@ -166,12 +173,12 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
                     </div>
                   </div>
 
-                  <p className="text-xs text-slate-400 line-clamp-2 mb-3 leading-relaxed">
+                  <p className="text-xs text-slate-300 line-clamp-2 mb-3 leading-relaxed">
                     {model.description}
                   </p>
 
-                  <div className="flex items-center justify-between text-[11px] text-slate-500 pt-2 border-t border-slate-800/80 mt-auto">
-                    <span className="text-cyan-400/90 font-medium px-2 py-0.5 rounded bg-space-900 border border-slate-800">
+                  <div className="flex items-center justify-between text-[11px] text-slate-400 pt-2 border-t border-slate-800/80 mt-auto">
+                    <span className="text-cyan-400 font-medium px-2 py-0.5 rounded bg-space-900 border border-slate-800">
                       {model.category}
                     </span>
                     <span className="font-mono text-slate-400">
@@ -188,13 +195,13 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
         <div className="flex items-center justify-between px-6 py-4 border-t border-slate-800 bg-space-850/80">
           <div className="flex items-center gap-2 text-xs text-slate-400">
             <Info className="w-4 h-4 text-cyan-400 shrink-0" />
-            <span>Frontier engines executing concurrently with independent millisecond benchmarking.</span>
+            <span>Tüm modeller doğrudan resmi NVIDIA NIM API üzerinden ücretsiz ve eşzamanlı sorgulanır.</span>
           </div>
           <button
             onClick={onClose}
             className="px-5 py-2 text-xs font-semibold rounded-lg bg-cyan-500 hover:bg-cyan-400 text-space-950 transition-colors shadow-sm"
           >
-            Apply ({selectedModelIds.length} Models)
+            Seçimi Uygula ({selectedModelIds.length} Model)
           </button>
         </div>
       </div>

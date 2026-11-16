@@ -71,7 +71,7 @@ async def test_compare_prompt():
             "/api/compare",
             json={
                 "prompt": "Hello in one word",
-                "model_ids": ["openai/gpt-5"],
+                "model_ids": ["poolside/laguna-xs-2.1"],
                 "timeout": 15.0
             }
         )
@@ -80,5 +80,5 @@ async def test_compare_prompt():
         assert "results" in data
         assert len(data["results"]) == 1
         res = data["results"][0]
-        assert res["model_id"] == "openai/gpt-5"
+        assert res["model_id"] == "poolside/laguna-xs-2.1"
         assert res["status"] in ["success", "timeout", "error"]

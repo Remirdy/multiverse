@@ -1,47 +1,35 @@
 import time
-import os
 import asyncio
-from typing import Optional, Dict
+from typing import Optional
 from openai import AsyncOpenAI, APIError, AuthenticationError, RateLimitError
 from app.core.config import settings
 from app.providers.base import BaseProvider, ProviderResponse
 from app.providers.registry import model_registry
 
-# Frontier model mappings to verified high-performance compute engines on NVIDIA NIM
-FRONTIER_NIM_BACKEND_MAP: Dict[str, str] = {
-    "anthropic/claude-sonnet-5.5": "poolside/laguna-xs-2.1",
-    "openai/gpt-5": "nvidia/nemotron-3.5-lightning-30b-a3b",
-    "google/gemini-3.8-flash": "nvidia/nemotron-3.5-bolt-e4b",
-    "anthropic/claude-opus-4.6": "nvidia/nemotron-3-ultra-550b-a55b",
-    "openai/4-hydrogen": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
-    "openai/4-argon": "nvidia/nemotron-3.5-super-vl-120b-a12b",
-    "anthropic/claude-sonnet-4.6": "poolside/laguna-xs-2.1",
-}
-
-class UnifiedProvider(BaseProvider):
-    provider_name: str = "Frontier Engine"
+class NvidiaProvider(BaseProvider):
+    provider_name: str = "NVIDIA NIM"
 
     def __init__(self):
-        self._nim_client: Optional[AsyncOpenAI] = None
+        self._client: Optional[AsyncOpenAI] = None
 
-    def _get_nim_client(self) -> Optional[AsyncOpenAI]:
+    def _get_client(self) -> Optional[AsyncOpenAI]:
         """Lazy-initialize and reuse AsyncOpenAI client instance for NVIDIA NIM"""
         api_key = settings.NVIDIA_API_KEY.strip()
         if not api_key:
             return None
-        if self._nim_client is None:
-            self._nim_client = AsyncOpenAI(
+        if self._client is None:
+            self._client = AsyncOpenAI(
                 base_url=settings.NVIDIA_BASE_URL,
                 api_key=api_key,
                 timeout=settings.DEFAULT_TIMEOUT_SECONDS
             )
-        return self._nim_client
+        return self._client
 
     def reload_client(self):
-        self._nim_client = None
+        self._client = None
 
     async def check_health(self) -> bool:
-        return bool(settings.NVIDIA_API_KEY.strip() or os.getenv("OPENAI_API_KEY") or os.getenv("ANTHROPIC_API_KEY"))
+        return bool(settings.NVIDIA_API_KEY.strip())
 
     async def generate(
         self,
@@ -52,21 +40,18 @@ class UnifiedProvider(BaseProvider):
     ) -> ProviderResponse:
         model_info = model_registry.get(model_id)
         model_name = model_info.name if model_info else model_id
-        provider_label = model_info.provider if model_info else "AI"
+        provider_name = model_info.provider if model_info else self.provider_name
 
-        # Determine target execution model on NVIDIA NIM
-        target_nim_model = FRONTIER_NIM_BACKEND_MAP.get(model_id, model_id)
-        client = self._get_nim_client()
-
+        client = self._get_client()
         if client is None:
             return ProviderResponse(
                 model_id=model_id,
                 model_name=model_name,
-                provider=provider_label,
+                provider=provider_name,
                 response_text=None,
                 response_time_ms=None,
                 status="error",
-                error_message="API Key not configured. Please set NVIDIA_API_KEY in backend/.env to query frontier model engines."
+                error_message="NVIDIA API Key not configured. Please set NVIDIA_API_KEY in backend/.env."
             )
 
         messages = []
@@ -78,7 +63,7 @@ class UnifiedProvider(BaseProvider):
 
         try:
             completion_coroutine = client.chat.completions.create(
-                model=target_nim_model,
+                model=model_id,
                 messages=messages,
                 temperature=0.7,
                 max_tokens=2048,
@@ -93,7 +78,7 @@ class UnifiedProvider(BaseProvider):
             return ProviderResponse(
                 model_id=model_id,
                 model_name=model_name,
-                provider=provider_label,
+                provider=provider_name,
                 response_text=content,
                 response_time_ms=elapsed_ms,
                 status="success",
@@ -105,11 +90,11 @@ class UnifiedProvider(BaseProvider):
             return ProviderResponse(
                 model_id=model_id,
                 model_name=model_name,
-                provider=provider_label,
+                provider=provider_name,
                 response_text=None,
                 response_time_ms=elapsed_ms,
                 status="timeout",
-                error_message=f"Model execution timed out after {timeout} seconds."
+                error_message=f"Model response timed out after {timeout} seconds."
             )
 
         except AuthenticationError:
@@ -117,11 +102,11 @@ class UnifiedProvider(BaseProvider):
             return ProviderResponse(
                 model_id=model_id,
                 model_name=model_name,
-                provider=provider_label,
+                provider=provider_name,
                 response_text=None,
                 response_time_ms=elapsed_ms,
                 status="error",
-                error_message="Authentication failed: Invalid or expired API credentials."
+                error_message="Authentication failed: Invalid or expired NVIDIA API Key."
             )
 
         except RateLimitError as e:
@@ -129,11 +114,11 @@ class UnifiedProvider(BaseProvider):
             return ProviderResponse(
                 model_id=model_id,
                 model_name=model_name,
-                provider=provider_label,
+                provider=provider_name,
                 response_text=None,
                 response_time_ms=elapsed_ms,
                 status="error",
-                error_message=f"Rate limit exceeded on provider: {str(e)}"
+                error_message=f"Rate limit exceeded on NVIDIA NIM: {str(e)}"
             )
 
         except APIError as e:
@@ -141,11 +126,11 @@ class UnifiedProvider(BaseProvider):
             return ProviderResponse(
                 model_id=model_id,
                 model_name=model_name,
-                provider=provider_label,
+                provider=provider_name,
                 response_text=None,
                 response_time_ms=elapsed_ms,
                 status="error",
-                error_message=f"API Error: {str(e)}"
+                error_message=f"NVIDIA API Error: {str(e)}"
             )
 
         except Exception as e:
@@ -153,11 +138,11 @@ class UnifiedProvider(BaseProvider):
             return ProviderResponse(
                 model_id=model_id,
                 model_name=model_name,
-                provider=provider_label,
+                provider=provider_name,
                 response_text=None,
                 response_time_ms=elapsed_ms,
                 status="error",
                 error_message=f"Unexpected error: {str(e)}"
             )
 
-nvidia_provider = UnifiedProvider()
+nvidia_provider = NvidiaProvider()

@@ -4,86 +4,86 @@ from app.schemas.model import ModelInfo
 class ModelRegistry:
     def __init__(self):
         self._models: Dict[str, ModelInfo] = {}
-        self._register_frontier_models()
+        self._register_nvidia_models()
 
-    def _register_frontier_models(self):
+    def _register_nvidia_models(self):
         models = [
             ModelInfo(
-                id="anthropic/claude-sonnet-5.5",
-                name="Claude Sonnet 5.5",
-                provider="Anthropic",
-                description="State-of-the-art coding, autonomous software engineering, recursive self-correction, and systems architecture.",
-                category="Agentic Coding & Software",
-                context_length=200000,
+                id="poolside/laguna-xs-2.1",
+                name="Poolside Laguna XS",
+                provider="NVIDIA NIM",
+                description="Claude Sonnet 5.5 muadili. Özel kod tabanları, algoritmalar, refactoring ve derin yazılım mimarisi uzmanı.",
+                category="Kod & Yazılım (Sonnet 5.5 Muadili)",
+                context_length=64000,
                 is_available=True,
                 is_default=True,
-                tags=["programming", "code", "agentic", "default"]
+                tags=["programming", "code", "sonnet-tier", "default"]
             ),
             ModelInfo(
-                id="openai/gpt-5",
-                name="GPT-5",
-                provider="OpenAI",
-                description="Next-generation frontier reasoning model with autonomous multi-step planning, mathematical deduction, and deep logic.",
-                category="Frontier Reasoning & Planning",
-                context_length=256000,
+                id="nvidia/nemotron-3.5-lightning-30b-a3b",
+                name="Nemotron 3.5 Lightning",
+                provider="NVIDIA NIM",
+                description="GPT-5 Reasoning muadili. Yüksek hızlı matematiksel ispatlar, kalkülüs, cebir ve formel mantık çıkarımı.",
+                category="Matematik & Mantık (GPT-5 Muadili)",
+                context_length=128000,
                 is_available=True,
                 is_default=True,
-                tags=["reasoning", "math", "planning", "default"]
+                tags=["math", "logic", "gpt5-tier", "default"]
             ),
             ModelInfo(
-                id="google/gemini-3.8-flash",
-                name="Gemini 3.8 Flash",
-                provider="Google",
-                description="Ultra-fast, high-throughput multimodal intelligence engine with massive context comprehension and sub-second execution.",
-                category="Fast Multimodal & General",
-                context_length=1000000,
+                id="nvidia/nemotron-3-ultra-550b-a55b",
+                name="Nemotron 3 Ultra 550B",
+                provider="NVIDIA NIM",
+                description="Claude Opus 4.6 muadili. 550 Milyar parametreli devasa akademik sentez, felsefe, kozmoloji ve derin beşeri bilimler.",
+                category="Frontier Sentez (Claude Opus Muadili)",
+                context_length=128000,
                 is_available=True,
                 is_default=True,
-                tags=["multimodal", "fast", "general", "default"]
+                tags=["frontier", "opus-tier", "synthesis", "default"]
             ),
             ModelInfo(
-                id="anthropic/claude-opus-4.6",
-                name="Claude Opus 4.6",
-                provider="Anthropic",
-                description="Anthropic's pinnacle systems reasoning model for deep philosophical inquiry, complex humanities, and nuanced synthesis.",
-                category="Philosophy & Systems Synthesis",
-                context_length=200000,
+                id="nvidia/nemotron-3.5-bolt-e4b",
+                name="Nemotron 3.5 Bolt",
+                provider="NVIDIA NIM",
+                description="Gemini 3.8 Flash muadili. 200 milisaniyelik sub-second yanıt hızı, çok yönlü hızlı özetleme ve dinamik diyalog.",
+                category="Ultra Hızlı & Özet (Gemini Flash Muadili)",
+                context_length=64000,
                 is_available=True,
                 is_default=False,
-                tags=["philosophy", "creative", "synthesis", "humanities"]
+                tags=["fast", "gemini-flash-tier", "speed"]
             ),
             ModelInfo(
-                id="openai/4-hydrogen",
-                name="4-Hydrogen",
-                provider="OpenAI Frontier",
-                description="Specialized frontier engine tailored for empirical scientific hypotheses, physics, biochemistry, and quantitative analysis.",
-                category="Scientific Research & Hypotheses",
-                context_length=256000,
+                id="nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+                name="Nemotron Nano Omni",
+                provider="NVIDIA NIM",
+                description="4-Hydrogen muadili. Fizik, kimya, termodinamik ve nicel STEM hipotezlerinde adım adım şeffaf çıkarım.",
+                category="Bilimsel Araştırma (4-Hydrogen Muadili)",
+                context_length=128000,
                 is_available=True,
                 is_default=False,
-                tags=["science", "physics", "quantitative", "stem"]
+                tags=["science", "hydrogen-tier", "stem"]
             ),
             ModelInfo(
-                id="openai/4-argon",
-                name="4-Argon",
-                provider="OpenAI Frontier",
-                description="Heavy systems engineering and robotics intelligence optimized for hardware schematics, control systems, and CAD dynamics.",
-                category="Robotics & Systems Engineering",
-                context_length=256000,
+                id="nvidia/nemotron-3.5-super-vl-120b-a12b",
+                name="Nemotron Super VL 120B",
+                provider="NVIDIA NIM",
+                description="4-Argon muadili. 120B çok modlu kapasite; robotik kinematiği, ROS sistemleri, PID kontrol ve donanım CAD mühendisliği.",
+                category="Robotik & Sistem (4-Argon Muadili)",
+                context_length=128000,
                 is_available=True,
                 is_default=False,
-                tags=["robotics", "engineering", "hardware", "cad"]
+                tags=["robotics", "argon-tier", "engineering"]
             ),
             ModelInfo(
-                id="anthropic/claude-sonnet-4.6",
-                name="Claude Sonnet 4.6",
-                provider="Anthropic",
-                description="High-precision enterprise code refactoring and algorithmic optimization model with strict instruction adherence.",
-                category="Refactoring & Algorithms",
-                context_length=200000,
+                id="nvidia/riva-translate-4b-instruct-v2",
+                name="Riva Translate 4B",
+                provider="NVIDIA NIM",
+                description="Yüksek doğruluklu nöral çeviri ve dilbilim motoru; 150 ms rekor gecikmeyle kusursuz çok dilli yerelleştirme.",
+                category="Çeviri & Dilbilim (NVIDIA Riva)",
+                context_length=32000,
                 is_available=True,
                 is_default=False,
-                tags=["refactoring", "algorithms", "software"]
+                tags=["translation", "linguistics", "multilingual"]
             ),
         ]
         for m in models:

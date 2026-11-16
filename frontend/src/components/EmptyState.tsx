@@ -9,40 +9,46 @@ interface EmptyStateProps {
 export const EmptyState: React.FC<EmptyStateProps> = ({ onSelectPrompt }) => {
   const suggestions = [
     {
-      title: 'Agentic Software Engineering',
+      title: 'Yazılım & Kod Mimarisi',
       icon: Terminal,
-      specialist: 'Claude Sonnet 5.5',
-      prompt: 'Compare Python asyncio vs Go goroutines for a high-throughput event processing pipeline with memory leak safety.',
+      specialist: 'Poolside Laguna XS',
+      equivalent: 'Claude Sonnet 5.5 Muadili',
+      prompt: 'Python asyncio vs Go goroutines karşılaştırması yap. Yüksek eşzamanlı bir veri kuyruğunda bellek güvenliği ve throughput kıyaslaması sun.',
     },
     {
-      title: 'Frontier Mathematical Deduction',
+      title: 'Matematik & Formel Mantık',
       icon: Calculator,
-      specialist: 'GPT-5',
-      prompt: 'Derive the spectral theorem for compact self-adjoint operators and explain its implications in quantum state vectors.',
+      specialist: 'Nemotron 3.5 Lightning',
+      equivalent: 'GPT-5 Reasoning Muadili',
+      prompt: '3x3 simetrik bir matrisin özdeğer ve özvektörlerini hesaplayıp kuantum durum vektörlerindeki geometrik dönüşümünü adım adım ispatla.',
     },
     {
-      title: 'Sub-Second Multimodal Reasoning',
-      icon: Sparkles,
-      specialist: 'Gemini 3.8 Flash',
-      prompt: 'Provide a rapid executive synthesis of how neuromorphic computing architectures differ from Von Neumann systems.',
-    },
-    {
-      title: 'Empirical Physics & Chemistry',
-      icon: Atom,
-      specialist: '4-Hydrogen',
-      prompt: 'Formulate an empirical hypothesis evaluating entropy generation and microstate phase space in non-equilibrium thermodynamics.',
-    },
-    {
-      title: 'Robotics Dynamics & Control',
-      icon: Cpu,
-      specialist: '4-Argon',
-      prompt: 'Explain how to formulate the Lagrangian dynamics and non-linear inverse kinematics for an autonomous hexapod walking robot.',
-    },
-    {
-      title: 'Deep Systems Philosophy',
+      title: 'Derin Akademik & Felsefe',
       icon: BookOpen,
-      specialist: 'Claude Opus 4.6',
-      prompt: 'Explore the philosophical paradox of consciousness and intentionality in artificial substrates from an epistemological perspective.',
+      specialist: 'Nemotron 3 Ultra 550B',
+      equivalent: 'Claude Opus 4.6 Muadili',
+      prompt: 'Kozmolojide termodinamik zaman oku ile kuantum dolanıklığı arasındaki ilişkiyi kapsamlı ve felsefi bir derinlikle açıkla.',
+    },
+    {
+      title: 'Ultra Hızlı Özet & Analiz',
+      icon: Sparkles,
+      specialist: 'Nemotron 3.5 Bolt',
+      equivalent: 'Gemini 3.8 Flash Muadili',
+      prompt: 'Nöromorfik çip mimarilerinin klasik Von Neumann mimarisine göre 3 temel donanımsal farkını 200 milisaniyede özetle.',
+    },
+    {
+      title: 'Deneysel Bilim & Hipotez',
+      icon: Atom,
+      specialist: 'Nemotron Nano Omni',
+      equivalent: '4-Hydrogen Muadili',
+      prompt: 'Termodinamiğin ikinci yasasının izole makroskopik sistemlerde entropiyi neden tek yönlü artırdığını adım adım çıkarımla açıkla.',
+    },
+    {
+      title: 'Robotik & Sistem Mühendisliği',
+      icon: Cpu,
+      specialist: 'Nemotron Super VL 120B',
+      equivalent: '4-Argon Muadili',
+      prompt: '6 serbestlik dereceli (DOF) bir robotik kol için değişen yüklere karşı adaptif PID kontrol ve ters kinematik formülasyonunu yaz.',
     },
   ];
 
@@ -61,7 +67,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({ onSelectPrompt }) => {
             One question. Multiple minds.
           </p>
           <p className="text-xs text-slate-400 max-w-xl mx-auto leading-relaxed">
-            Query next-generation frontier intelligence simultaneously. Compare <strong>GPT-5</strong>, <strong>Claude Sonnet 5.5</strong>, <strong>Claude Opus 4.6</strong>, <strong>Gemini 3.8 Flash</strong>, <strong>4-Hydrogen</strong>, and <strong>4-Argon</strong> side-by-side.
+            NVIDIA NIM API altyapısıyla çalışan, <strong>Claude Sonnet</strong>, <strong>GPT-5</strong>, <strong>Claude Opus</strong>, <strong>Gemini Flash</strong>, <strong>4-Hydrogen</strong> ve <strong>4-Argon</strong> kalibresindeki resmi uzman modelleri eşzamanlı sorgulayın.
           </p>
         </div>
       </div>
@@ -85,9 +91,9 @@ export const EmptyState: React.FC<EmptyStateProps> = ({ onSelectPrompt }) => {
               <p className="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">
                 "{item.prompt}"
               </p>
-              <div className="pt-1 border-t border-slate-800/80 flex items-center justify-between text-[10px]">
-                <span className="text-slate-500">Specialist:</span>
-                <span className="text-cyan-400 font-mono font-medium">{item.specialist}</span>
+              <div className="pt-1.5 border-t border-slate-800/80 flex items-center justify-between text-[10px]">
+                <span className="text-cyan-400 font-mono font-medium truncate">{item.specialist}</span>
+                <span className="text-slate-500 font-sans shrink-0">{item.equivalent}</span>
               </div>
             </button>
           );
