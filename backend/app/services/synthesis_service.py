@@ -6,12 +6,18 @@ from app.schemas.compare import ModelResponseSummary, SynthesizeResponse
 
 class SynthesisService:
     def __init__(self):
-        self.client = AsyncOpenAI(
-            base_url=settings.NVIDIA_BASE_URL,
-            api_key=settings.NVIDIA_API_KEY
-        )
+        self._client = None
         self.primary_model = "nvidia/nemotron-3-ultra-550b-a55b"
         self.fallback_model = "nvidia/nemotron-3.5-super-vl-120b-a12b"
+
+    @property
+    def client(self):
+        if self._client is None and settings.NVIDIA_API_KEY.strip():
+            self._client = AsyncOpenAI(
+                base_url=settings.NVIDIA_BASE_URL,
+                api_key=settings.NVIDIA_API_KEY.strip()
+            )
+        return self._client
 
     async def synthesize(self, prompt: str, responses: List[ModelResponseSummary], language: str = "tr") -> SynthesizeResponse:
         start_time = time.perf_counter()

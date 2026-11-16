@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { api } from './services/api';
 import {
+  AppWorkspace,
   ModelInfo,
   ConversationSummary,
   ConversationDetail,
@@ -17,38 +18,40 @@ import { EmptyState } from './components/EmptyState';
 import { ModelSelector } from './components/ModelSelector';
 import { ApiKeyModal } from './components/ApiKeyModal';
 import { RoutingBadge } from './components/RoutingBadge';
+import { CouncilWorkspace } from './features/council/CouncilWorkspace';
+import { WorkflowsWorkspace } from './features/workflows/WorkflowsWorkspace';
+import { StudyLabWorkspace } from './features/study/StudyLabWorkspace';
 
 export const App: React.FC = () => {
-  // State
+  const [activeWorkspace, setActiveWorkspace] = useState<AppWorkspace>('compare');
+  const [councilPrefill, setCouncilPrefill] = useState<string>('');
+  const [workflowPrefill, setWorkflowPrefill] = useState<string>('');
+
+  // Compare State
   const [models, setModels] = useState<ModelInfo[]>([]);
   const [selectedModelIds, setSelectedModelIds] = useState<string[]>([]);
   const [conversations, setConversations] = useState<ConversationSummary[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [activeConversation, setActiveConversation] = useState<ConversationDetail | null>(null);
-  
-  // In-memory turns for active view
+
   const [turns, setTurns] = useState<TurnDetail[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [retryingModelKeys, setRetryingModelKeys] = useState<Set<string>>(new Set());
 
-  // Routing State
   const [routeInfo, setRouteInfo] = useState<RouteResponse | null>(null);
   const [isAutoRouteEnabled, setIsAutoRouteEnabled] = useState<boolean>(false);
 
-  // Health & UI Modals
   const [health, setHealth] = useState<ProviderHealth | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
   const [isModelSelectorOpen, setIsModelSelectorOpen] = useState<boolean>(false);
   const [isKeyModalOpen, setIsKeyModalOpen] = useState<boolean>(false);
 
-  // Scroll ref
   const scrollEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
     scrollEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Initial load
   useEffect(() => {
     loadModels();
     loadConversations();
@@ -59,11 +62,13 @@ export const App: React.FC = () => {
     try {
       const res = await api.getModels();
       setModels(res.models);
-      if (res.default_models && res.default_models.length > 0) {
-        setSelectedModelIds(res.default_models.slice(0, 3));
-      } else {
-        setSelectedModelIds(res.models.slice(0, 3).map((m) => m.id));
-      }
+      setSelectedModelIds((prev) => {
+        if (prev.length > 0) return prev;
+        if (res.default_models && res.default_models.length > 0) {
+          return res.default_models.slice(0, 3);
+        }
+        return res.models.slice(0, 3).map((m) => m.id);
+      });
     } catch (err) {
       console.error('Failed to load models:', err);
     }
@@ -87,7 +92,6 @@ export const App: React.FC = () => {
     }
   };
 
-  // Switch conversation
   const handleSelectConversation = async (id: string) => {
     try {
       setActiveConversationId(id);
@@ -102,7 +106,6 @@ export const App: React.FC = () => {
     }
   };
 
-  // Start new comparison
   const handleNewConversation = () => {
     setActiveConversationId(null);
     setActiveConversation(null);
@@ -110,7 +113,6 @@ export const App: React.FC = () => {
     setRouteInfo(null);
   };
 
-  // Delete conversation
   const handleDeleteConversation = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     try {
@@ -124,14 +126,13 @@ export const App: React.FC = () => {
     }
   };
 
-  // Toggle model selection
   const handleToggleModel = (modelId: string) => {
     setSelectedModelIds((prev) => {
       if (prev.includes(modelId)) {
-        if (prev.length <= 1) return prev; // Keep at least one
+        if (prev.length <= 1) return prev;
         return prev.filter((id) => id !== modelId);
       } else {
-        if (prev.length >= 6) return prev; // Limit max to 6
+        if (prev.length >= 6) return prev;
         return [...prev, modelId];
       }
     });
@@ -141,7 +142,6 @@ export const App: React.FC = () => {
     setSelectedModelIds(modelIds);
   };
 
-  // Automatic routing query debounced on prompt change
   const handlePromptChange = useCallback(
     async (text: string) => {
       if (!text.trim() || text.length < 8) {
@@ -151,8 +151,6 @@ export const App: React.FC = () => {
       try {
         const route = await api.routePrompt(text);
         setRouteInfo(route);
-
-        // If auto-route mode is enabled, dynamically target recommended models
         if (isAutoRouteEnabled && route.recommended_model_ids.length > 0) {
           setSelectedModelIds(route.recommended_model_ids);
         }
@@ -163,17 +161,13 @@ export const App: React.FC = () => {
     [isAutoRouteEnabled]
   );
 
-  // Send message for multi-model comparison
   const handleSendMessage = async (prompt: string, systemPrompt?: string, attachments?: any[], webSearch?: boolean) => {
-    // Check if attachments contains visual graphics (photos, schematics, rendered PDF pages)
     const hasVisualAttachments = attachments?.some(
       (it) => it.file_type === 'image' || (it.page_images && it.page_images.length > 0)
     );
 
     let activeModelIds = selectedModelIds;
 
-    // Strict Vision Enforcement: If visual schematics or images are attached,
-    // exclusively route to Vision-capable models so text-only models do not hallucinate or apologize
     if (hasVisualAttachments) {
       const visionModelIds = models
         .filter((m) => m.id.includes('vl') || m.id.includes('vision') || m.tags.includes('vision'))
@@ -183,10 +177,10 @@ export const App: React.FC = () => {
       if (filteredVision.length > 0) {
         activeModelIds = filteredVision;
       } else {
-        activeModelIds = visionModelIds.length > 0 ? visionModelIds : [
-          'nvidia/nemotron-3.5-super-vl-120b-a12b',
-          'meta/llama-3.2-90b-vision-instruct'
-        ];
+        activeModelIds =
+          visionModelIds.length > 0
+            ? visionModelIds
+            : ['nvidia/nemotron-3.5-super-vl-120b-a12b', 'meta/llama-3.2-90b-vision-instruct'];
       }
       setSelectedModelIds(activeModelIds);
     } else if (isAutoRouteEnabled && routeInfo && routeInfo.recommended_model_ids.length > 0) {
@@ -231,7 +225,6 @@ export const App: React.FC = () => {
         web_search: webSearch,
       });
 
-      // Update turn with actual results
       const completedTurn: TurnDetail = {
         id: response.turn_id,
         prompt: response.prompt,
@@ -242,17 +235,12 @@ export const App: React.FC = () => {
         web_search_results: response.web_search_results,
       };
 
-      setTurns((prev) =>
-        prev.map((t) => (t.id === tempTurnId ? completedTurn : t))
-      );
-
-      // If this was a new conversation, set active ID and refresh history
+      setTurns((prev) => prev.map((t) => (t.id === tempTurnId ? completedTurn : t)));
       if (!activeConversationId) {
         setActiveConversationId(response.conversation_id);
       }
       loadConversations();
     } catch (err: any) {
-      // If complete network/request error occurred
       const failedResults: ModelResult[] = activeModelIds.map((mid) => {
         const m = models.find((mod) => mod.id === mid);
         return {
@@ -265,30 +253,17 @@ export const App: React.FC = () => {
           error_message: err.message || 'Comparison request failed',
         };
       });
-
-      setTurns((prev) =>
-        prev.map((t) =>
-          t.id === tempTurnId ? { ...t, responses: failedResults } : t
-        )
-      );
+      setTurns((prev) => prev.map((t) => (t.id === tempTurnId ? { ...t, responses: failedResults } : t)));
     } finally {
       setIsLoading(false);
       setTimeout(scrollToBottom, 100);
     }
   };
 
-  // Retry individual model
-  const handleRetryModel = async (
-    turnId: string,
-    modelId: string,
-    prompt: string,
-    systemPrompt?: string
-  ) => {
+  const handleRetryModel = async (turnId: string, modelId: string, prompt: string, systemPrompt?: string) => {
     if (!activeConversationId) return;
-
     const retryKey = `${turnId}-${modelId}`;
     setRetryingModelKeys((prev) => new Set(prev).add(retryKey));
-
     try {
       const updatedResult = await api.retry({
         conversation_id: activeConversationId,
@@ -297,18 +272,12 @@ export const App: React.FC = () => {
         prompt,
         system_prompt: systemPrompt,
       });
-
-      // Update state for this specific card
       setTurns((prev) =>
-        prev.map((turn) => {
-          if (turn.id !== turnId) return turn;
-          return {
-            ...turn,
-            responses: turn.responses.map((r) =>
-              r.model_id === modelId ? updatedResult : r
-            ),
-          };
-        })
+        prev.map((turn) =>
+          turn.id !== turnId
+            ? turn
+            : { ...turn, responses: turn.responses.map((r) => (r.model_id === modelId ? updatedResult : r)) }
+        )
       );
     } catch (err: any) {
       console.error('Failed to retry model:', err);
@@ -321,9 +290,21 @@ export const App: React.FC = () => {
     }
   };
 
-  const selectedModelObjects = models.filter((m) =>
-    selectedModelIds.includes(m.id)
-  );
+  const handleSaveToNotebook = async (title: string, content: string, origin: string) => {
+    try {
+      await api.createNotebook({
+        title: title || 'Saved Council Result',
+        course: origin === 'council' ? 'Council' : 'Study',
+        notes_markdown: content,
+        saved_items: [{ title, content, origin }],
+      });
+      setActiveWorkspace('study');
+    } catch (err) {
+      console.error('Failed saving to notebook:', err);
+    }
+  };
+
+  const selectedModelObjects = models.filter((m) => selectedModelIds.includes(m.id));
 
   const handleAutoSelectVisionModels = () => {
     const visionModels = models.filter(
@@ -345,22 +326,23 @@ export const App: React.FC = () => {
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-space-950 text-slate-100">
-      {/* Sidebar */}
-      <Sidebar
-        isOpen={isSidebarOpen}
-        onClose={() => setIsSidebarOpen(false)}
-        conversations={conversations}
-        activeConversationId={activeConversationId}
-        onSelectConversation={handleSelectConversation}
-        onNewConversation={handleNewConversation}
-        onDeleteConversation={handleDeleteConversation}
-        isBackendConnected={health !== null}
-      />
+      {activeWorkspace === 'compare' && (
+        <Sidebar
+          isOpen={isSidebarOpen}
+          onClose={() => setIsSidebarOpen(false)}
+          conversations={conversations}
+          activeConversationId={activeConversationId}
+          onSelectConversation={handleSelectConversation}
+          onNewConversation={handleNewConversation}
+          onDeleteConversation={handleDeleteConversation}
+          isBackendConnected={health !== null}
+        />
+      )}
 
-      {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
-        {/* Top Header */}
         <Header
+          activeWorkspace={activeWorkspace}
+          onSelectWorkspace={setActiveWorkspace}
           onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
           selectedModels={selectedModelObjects}
           onOpenModelSelector={() => setIsModelSelectorOpen(true)}
@@ -369,49 +351,75 @@ export const App: React.FC = () => {
           onOpenKeyModal={() => setIsKeyModalOpen(true)}
         />
 
-        {/* Workspace Chat Area */}
-        <main className="flex-1 overflow-y-auto custom-scrollbar flex flex-col">
-          {turns.length === 0 ? (
-            <EmptyState
-              onSelectPrompt={(p) => {
-                handleSendMessage(p);
-              }}
-            />
-          ) : (
-            <div className="flex-1 pb-4">
-              <ComparisonGrid
-                turns={turns}
-                onRetryModel={handleRetryModel}
-                retryingModelKeys={retryingModelKeys}
+        {activeWorkspace === 'compare' && (
+          <>
+            <main className="flex-1 overflow-y-auto custom-scrollbar flex flex-col">
+              {turns.length === 0 ? (
+                <EmptyState onSelectPrompt={(p) => handleSendMessage(p)} />
+              ) : (
+                <div className="flex-1 pb-4">
+                  <ComparisonGrid
+                    turns={turns}
+                    onRetryModel={handleRetryModel}
+                    retryingModelKeys={retryingModelKeys}
+                  />
+                  <div ref={scrollEndRef} />
+                </div>
+              )}
+            </main>
+
+            <div className="w-full max-w-5xl mx-auto px-4 pb-2">
+              <RoutingBadge
+                routeInfo={routeInfo}
+                onApplyRecommendation={(mIds) => setSelectedModelIds(mIds)}
+                isAutoRouteEnabled={isAutoRouteEnabled}
+                onToggleAutoRoute={() => setIsAutoRouteEnabled(!isAutoRouteEnabled)}
               />
-              <div ref={scrollEndRef} />
             </div>
-          )}
-        </main>
 
-        {/* Intelligent Routing Assistant Banner */}
-        <div className="w-full max-w-5xl mx-auto px-4 pb-2">
-          <RoutingBadge
-            routeInfo={routeInfo}
-            onApplyRecommendation={(mIds) => setSelectedModelIds(mIds)}
-            isAutoRouteEnabled={isAutoRouteEnabled}
-            onToggleAutoRoute={() => setIsAutoRouteEnabled(!isAutoRouteEnabled)}
+            <ChatInput
+              onSendMessage={handleSendMessage}
+              isLoading={isLoading}
+              selectedModels={selectedModelObjects}
+              onOpenModelSelector={() => setIsModelSelectorOpen(true)}
+              onPromptChange={handlePromptChange}
+              onAddVisionModel={handleAddVisionModel}
+              onAutoSelectVisionModels={handleAutoSelectVisionModels}
+            />
+          </>
+        )}
+
+        {activeWorkspace === 'council' && (
+          <CouncilWorkspace
+            models={models}
+            initialPrompt={councilPrefill}
+            onSaveToNotebook={handleSaveToNotebook}
+            onSendToWorkflow={(text) => {
+              setWorkflowPrefill(text);
+              setActiveWorkspace('workflows');
+            }}
           />
-        </div>
+        )}
 
-        {/* Prompt Input Area */}
-        <ChatInput
-          onSendMessage={handleSendMessage}
-          isLoading={isLoading}
-          selectedModels={selectedModelObjects}
-          onOpenModelSelector={() => setIsModelSelectorOpen(true)}
-          onPromptChange={handlePromptChange}
-          onAddVisionModel={handleAddVisionModel}
-          onAutoSelectVisionModels={handleAutoSelectVisionModels}
-        />
+        {activeWorkspace === 'workflows' && (
+          <WorkflowsWorkspace models={models} initialInputText={workflowPrefill} />
+        )}
+
+        {activeWorkspace === 'study' && (
+          <StudyLabWorkspace
+            models={models}
+            onOpenInCouncil={(question) => {
+              setCouncilPrefill(question);
+              setActiveWorkspace('council');
+            }}
+            onSendToWorkflow={(text) => {
+              setWorkflowPrefill(text);
+              setActiveWorkspace('workflows');
+            }}
+          />
+        )}
       </div>
 
-      {/* Model Registry Selector Modal */}
       <ModelSelector
         isOpen={isModelSelectorOpen}
         onClose={() => setIsModelSelectorOpen(false)}
@@ -422,12 +430,12 @@ export const App: React.FC = () => {
         maxModels={6}
       />
 
-      {/* API Key / NVIDIA Status Modal */}
       <ApiKeyModal
         isOpen={isKeyModalOpen}
         onClose={() => setIsKeyModalOpen(false)}
         health={health}
         onRefreshHealth={checkHealth}
+        onModelsUpdated={loadModels}
       />
     </div>
   );

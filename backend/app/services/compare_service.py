@@ -7,11 +7,10 @@ from sqlalchemy import select
 
 from app.core.config import settings
 from app.database.models import Conversation, ComparisonTurn, ModelResponseRecord
-from app.providers.nvidia import nvidia_provider
+from app.execution.engine import execution_engine
 from app.providers.registry import model_registry
 from app.schemas.compare import ModelResult, CompareResponse
 from app.schemas.search import WebSearchResultItem
-from app.services.web_search_service import web_search_service
 
 class CompareService:
     async def compare_models(
@@ -38,9 +37,9 @@ class CompareService:
                 "Kullanıcı canlı internet aramasını talep etmiştir. Soruyu yanıtlarken güncel bilgi, ilan veya doküman gerekiyorsa web_search aracını aktif olarak kullanınız."
             )
 
-        # Dispatch async tasks concurrently - models autonomously decide if and what to search
+        # Dispatch async tasks concurrently through shared execution engine
         tasks = [
-            nvidia_provider.generate(
+            execution_engine.execute_model(
                 model_id=mid,
                 prompt=prompt,
                 system_prompt=effective_system_prompt if effective_system_prompt.strip() else None,
@@ -171,7 +170,7 @@ class CompareService:
         db: Optional[AsyncSession] = None
     ) -> ModelResult:
         effective_timeout = timeout or settings.DEFAULT_TIMEOUT_SECONDS
-        outcome = await nvidia_provider.generate(
+        outcome = await execution_engine.execute_model(
             model_id=model_id,
             prompt=prompt,
             system_prompt=system_prompt,

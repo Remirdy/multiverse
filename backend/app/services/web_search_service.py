@@ -2,17 +2,26 @@ import re
 import asyncio
 from typing import List, Tuple
 from openai import AsyncOpenAI
-from ddgs import DDGS
+try:
+    from ddgs import DDGS
+except ImportError:
+    DDGS = None
 from app.core.config import settings
 from app.schemas.search import WebSearchResultItem
 
 class WebSearchService:
     def __init__(self):
-        self.client = AsyncOpenAI(
-            base_url=settings.NVIDIA_BASE_URL,
-            api_key=settings.NVIDIA_API_KEY
-        )
+        self._client = None
         self.fast_model = "nvidia/nemotron-3.5-bolt-e4b"
+
+    @property
+    def client(self):
+        if self._client is None and settings.NVIDIA_API_KEY.strip():
+            self._client = AsyncOpenAI(
+                base_url=settings.NVIDIA_BASE_URL,
+                api_key=settings.NVIDIA_API_KEY.strip()
+            )
+        return self._client
 
     async def generate_search_query(self, prompt: str) -> str:
         """
@@ -67,6 +76,8 @@ class WebSearchService:
 
         def _do_search(q: str):
             items = []
+            if DDGS is None:
+                return items
             try:
                 with DDGS() as ddgs:
                     raw = list(ddgs.text(q, max_results=max_results))

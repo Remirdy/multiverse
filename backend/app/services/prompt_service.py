@@ -5,12 +5,18 @@ from app.schemas.router import EnhancePromptResponse
 
 class PromptEnhancementService:
     def __init__(self):
-        self.client = AsyncOpenAI(
-            base_url=settings.NVIDIA_BASE_URL,
-            api_key=settings.NVIDIA_API_KEY
-        )
+        self._client = None
         # Nemotron Bolt is sub-second (under 1s) and provides exceptional instruction following
         self.model = "nvidia/nemotron-3.5-bolt-e4b"
+
+    @property
+    def client(self):
+        if self._client is None and settings.NVIDIA_API_KEY.strip():
+            self._client = AsyncOpenAI(
+                base_url=settings.NVIDIA_BASE_URL,
+                api_key=settings.NVIDIA_API_KEY.strip()
+            )
+        return self._client
 
     async def enhance(self, prompt: str, language: str = "tr") -> EnhancePromptResponse:
         start_time = time.perf_counter()

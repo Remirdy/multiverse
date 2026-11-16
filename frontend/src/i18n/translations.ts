@@ -91,6 +91,19 @@ export const translations = {
     autoRouteOn: 'Otomatik Hedefleme Açık',
     autoRouteOff: 'Otomatik Hedefleme Kapalı',
     applyRecommended: 'Önerilen Modelleri Seç',
+
+    // Navigation & Modules
+    navCompare: 'Karşılaştır',
+    navCouncil: 'Konsey',
+    navWorkflows: 'İş Akışları',
+    navStudyLab: 'Çalışma Labı',
+    providersAndPolicy: 'Sağlayıcılar & Politika',
+    localOnlyMode: 'Yalnızca Yerel Mod',
+    freeOnlyMode: 'Yalnızca Ücretsiz/Yerel Politika',
+    studySolveLearn: 'Çöz & Öğren',
+    studyPractice: 'Pratik',
+    studyMaterials: 'Materyaller',
+    studyProgress: 'İlerleme',
   },
 
   en: {
@@ -183,5 +196,18 @@ export const translations = {
     autoRouteOn: 'Auto-Routing Enabled',
     autoRouteOff: 'Auto-Routing Disabled',
     applyRecommended: 'Apply Recommended Models',
+
+    // Navigation & Modules
+    navCompare: 'Compare',
+    navCouncil: 'Council',
+    navWorkflows: 'Workflows',
+    navStudyLab: 'Study Lab',
+    providersAndPolicy: 'Providers & Policy',
+    localOnlyMode: 'Local-Only Mode',
+    freeOnlyMode: 'Free/Local Policy',
+    studySolveLearn: 'Solve & Learn',
+    studyPractice: 'Practice',
+    studyMaterials: 'Materials',
+    studyProgress: 'Progress',
   }
 };

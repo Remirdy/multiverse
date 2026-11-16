@@ -6,7 +6,10 @@ from typing import Optional, List, Dict, Any, Tuple
 import requests
 from lxml import html
 from openai import AsyncOpenAI, APIError, AuthenticationError, RateLimitError
-from ddgs import DDGS
+try:
+    from ddgs import DDGS
+except ImportError:  # optional web-search fallback
+    DDGS = None
 from app.core.config import settings
 from app.providers.base import BaseProvider, ProviderResponse
 from app.providers.registry import model_registry
@@ -73,7 +76,7 @@ def _sync_web_search(query: str, max_results: int = 5) -> Tuple[str, List[Dict[s
         print(f"[_sync_web_search HTML search error for '{query}']: {e}")
 
     # 2. Fallback to ddgs library if HTML returned no results
-    if not items:
+    if not items and DDGS is not None:
         try:
             with DDGS() as ddgs:
                 raw = list(ddgs.text(query, max_results=max_results))

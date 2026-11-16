@@ -1,6 +1,7 @@
 from typing import Dict, List, Optional
 from app.schemas.model import ModelInfo
 
+
 class ModelRegistry:
     def __init__(self):
         self._models: Dict[str, ModelInfo] = {}
@@ -12,90 +13,185 @@ class ModelRegistry:
                 id="poolside/laguna-xs-2.1",
                 name="Poolside Laguna XS",
                 provider="NVIDIA NIM",
-                description="Claude Sonnet 5.5 muadili. Özel kod tabanları, algoritmalar, refactoring ve derin yazılım mimarisi uzmanı.",
+                provider_id="nvidia",
+                is_local=False,
+                is_free_tier=True,
+                description="Software engineering, algorithms, refactoring, and system architecture model.",
                 category="Kod & Yazılım (Sonnet 5.5 Muadili)",
                 context_length=64000,
                 is_available=True,
                 is_default=True,
-                tags=["programming", "code", "sonnet-tier", "default"]
+                tags=["programming", "code", "sonnet-tier", "default"],
+                capabilities={
+                    "chat": True,
+                    "vision": False,
+                    "structured_output": True,
+                    "tool_calling": True,
+                    "streaming": True,
+                    "context_length": 64000,
+                    "modalities": ["text", "code"],
+                },
             ),
             ModelInfo(
                 id="nvidia/nemotron-3.5-lightning-30b-a3b",
                 name="Nemotron 3.5 Lightning",
                 provider="NVIDIA NIM",
-                description="GPT-5 Reasoning muadili. Yüksek hızlı matematiksel ispatlar, kalkülüs, cebir ve formel mantık çıkarımı.",
+                provider_id="nvidia",
+                is_local=False,
+                is_free_tier=True,
+                description="Fast mathematical reasoning, calculus, linear algebra, and formal logic model.",
                 category="Matematik & Mantık (GPT-5 Muadili)",
                 context_length=128000,
                 is_available=True,
                 is_default=True,
-                tags=["math", "logic", "gpt5-tier", "default"]
+                tags=["math", "logic", "gpt5-tier", "default"],
+                capabilities={
+                    "chat": True,
+                    "vision": False,
+                    "structured_output": True,
+                    "tool_calling": True,
+                    "streaming": True,
+                    "context_length": 128000,
+                    "modalities": ["text", "math"],
+                },
             ),
             ModelInfo(
                 id="nvidia/nemotron-3-ultra-550b-a55b",
                 name="Nemotron 3 Ultra 550B",
                 provider="NVIDIA NIM",
-                description="Claude Opus 4.6 muadili. 550 Milyar parametreli devasa akademik sentez, felsefe, kozmoloji ve derin beşeri bilimler.",
+                provider_id="nvidia",
+                is_local=False,
+                is_free_tier=True,
+                description="Large synthesis and deep conceptual reasoning model for multi-perspective evaluation.",
                 category="Frontier Sentez (Claude Opus Muadili)",
                 context_length=128000,
                 is_available=True,
                 is_default=True,
-                tags=["frontier", "opus-tier", "synthesis", "default"]
+                tags=["frontier", "opus-tier", "synthesis", "default"],
+                capabilities={
+                    "chat": True,
+                    "vision": False,
+                    "structured_output": True,
+                    "tool_calling": True,
+                    "streaming": True,
+                    "context_length": 128000,
+                    "modalities": ["text"],
+                },
             ),
             ModelInfo(
                 id="nvidia/nemotron-3.5-bolt-e4b",
                 name="Nemotron 3.5 Bolt",
                 provider="NVIDIA NIM",
-                description="Gemini 3.8 Flash muadili. 200 milisaniyelik sub-second yanıt hızı, çok yönlü hızlı özetleme ve dinamik diyalog.",
+                provider_id="nvidia",
+                is_local=False,
+                is_free_tier=True,
+                description="Low-latency model suited for fast summarization, triage, and short responses.",
                 category="Ultra Hızlı & Özet (Gemini Flash Muadili)",
                 context_length=64000,
                 is_available=True,
                 is_default=False,
-                tags=["fast", "gemini-flash-tier", "speed"]
+                tags=["fast", "gemini-flash-tier", "speed"],
+                capabilities={
+                    "chat": True,
+                    "vision": False,
+                    "structured_output": True,
+                    "tool_calling": True,
+                    "streaming": True,
+                    "context_length": 64000,
+                    "modalities": ["text"],
+                },
             ),
             ModelInfo(
                 id="nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
                 name="Nemotron Nano Omni",
                 provider="NVIDIA NIM",
-                description="4-Hydrogen muadili. Fizik, kimya, termodinamik ve nicel STEM hipotezlerinde adım adım şeffaf çıkarım.",
+                provider_id="nvidia",
+                is_local=False,
+                is_free_tier=True,
+                description="Physics, chemistry, thermodynamics, and quantitative STEM reasoning model.",
                 category="Bilimsel Araştırma (4-Hydrogen Muadili)",
                 context_length=128000,
                 is_available=True,
                 is_default=False,
-                tags=["science", "hydrogen-tier", "stem"]
+                tags=["science", "hydrogen-tier", "stem"],
+                capabilities={
+                    "chat": True,
+                    "vision": False,
+                    "structured_output": True,
+                    "tool_calling": True,
+                    "streaming": True,
+                    "context_length": 128000,
+                    "modalities": ["text"],
+                },
             ),
             ModelInfo(
                 id="nvidia/nemotron-3.5-super-vl-120b-a12b",
                 name="Nemotron Super VL 120B",
                 provider="NVIDIA NIM",
-                description="4-Argon muadili. 120B çok modlu kapasite; devre şemaları, robotik kinematiği, ROS sistemleri, PID kontrol ve teknik çizimler.",
+                provider_id="nvidia",
+                is_local=False,
+                is_free_tier=True,
+                description="Multimodal vision model for circuit schematics, technical diagrams, and robotics.",
                 category="Görsel & Devre Şeması (4-Argon Vision)",
                 context_length=128000,
                 is_available=True,
                 is_default=False,
-                tags=["vision", "multimodal", "robotics", "argon-tier", "engineering"]
+                tags=["vision", "multimodal", "robotics", "argon-tier", "engineering"],
+                capabilities={
+                    "chat": True,
+                    "vision": True,
+                    "structured_output": True,
+                    "tool_calling": True,
+                    "streaming": True,
+                    "context_length": 128000,
+                    "modalities": ["text", "image"],
+                },
             ),
-
             ModelInfo(
                 id="mistralai/mistral-large-4-1t-a52b",
                 name="Mistral Large 4 1T",
                 provider="NVIDIA NIM",
-                description="Claude Sonnet 4.6 muadili. 1 Trilyon token bağlamlı derin muhakeme, analitik ve çok dilli genel zekâ.",
+                provider_id="nvidia",
+                is_local=False,
+                is_free_tier=True,
+                description="Multilingual general reasoning and analytical model.",
                 category="İleri Düzey Akıl Yürütme (Sonnet 4.6 Muadili)",
                 context_length=128000,
                 is_available=True,
                 is_default=False,
-                tags=["reasoning", "general", "mistral-tier"]
+                tags=["reasoning", "general", "mistral-tier"],
+                capabilities={
+                    "chat": True,
+                    "vision": False,
+                    "structured_output": True,
+                    "tool_calling": True,
+                    "streaming": True,
+                    "context_length": 128000,
+                    "modalities": ["text"],
+                },
             ),
             ModelInfo(
                 id="nvidia/riva-translate-4b-instruct-v2",
                 name="Riva Translate 4B",
                 provider="NVIDIA NIM",
-                description="Yüksek doğruluklu nöral çeviri ve dilbilim motoru; 150 ms rekor gecikmeyle kusursuz çok dilli yerelleştirme.",
+                provider_id="nvidia",
+                is_local=False,
+                is_free_tier=True,
+                description="Low-latency neural translation and localization model.",
                 category="Çeviri & Dilbilim (NVIDIA Riva)",
                 context_length=32000,
                 is_available=True,
                 is_default=False,
-                tags=["translation", "linguistics", "multilingual"]
+                tags=["translation", "linguistics", "multilingual"],
+                capabilities={
+                    "chat": True,
+                    "vision": False,
+                    "structured_output": False,
+                    "tool_calling": False,
+                    "streaming": True,
+                    "context_length": 32000,
+                    "modalities": ["text"],
+                },
             ),
         ]
         for m in models:
@@ -103,6 +199,37 @@ class ModelRegistry:
 
     def register(self, model: ModelInfo):
         self._models[model.id] = model
+
+    def register_local_models(self, provider_id: str, provider_name: str, model_ids: List[str], is_local: bool = True):
+        to_remove = [mid for mid, info in self._models.items() if info.provider_id == provider_id]
+        for mid in to_remove:
+            del self._models[mid]
+
+        for raw_id in model_ids:
+            full_id = f"{provider_id}::{raw_id}"
+            self._models[full_id] = ModelInfo(
+                id=full_id,
+                name=f"{raw_id} ({provider_name})",
+                provider=provider_name,
+                provider_id=provider_id,
+                is_local=is_local,
+                is_free_tier=True,
+                description=f"Discovered model served via {provider_name}.",
+                category="Local Inference" if is_local else "Custom Endpoint",
+                context_length=32768,
+                is_available=True,
+                is_default=False,
+                tags=["local" if is_local else "custom", provider_id],
+                capabilities={
+                    "chat": True,
+                    "vision": "vl" in raw_id.lower() or "vision" in raw_id.lower() or "llava" in raw_id.lower(),
+                    "structured_output": True,
+                    "tool_calling": False,
+                    "streaming": False,
+                    "context_length": 32768,
+                    "modalities": ["text"],
+                },
+            )
 
     def get(self, model_id: str) -> Optional[ModelInfo]:
         return self._models.get(model_id)
@@ -115,5 +242,6 @@ class ModelRegistry:
 
     def exists(self, model_id: str) -> bool:
         return model_id in self._models
+
 
 model_registry = ModelRegistry()

@@ -1,215 +1,139 @@
-# 🌌 MULTIVERSE — One Question. Multiple Minds.
+# MULTIVERSE — One Question. Multiple Minds.
 
 <div align="center">
 
-<img src="./frontend/public/logo.svg" alt="Multiverse Orbital Logo" width="100" height="100" />
+<img src="./frontend/public/logo.svg" alt="Multiverse Orbital Logo" width="96" height="96" />
 
-### High-Performance Multi-Model AI Orchestration & Comparison Engine
-*Powered by official NVIDIA NIM Microservices & Next-Gen Frontier Equivalents*
+### Multi-Model Comparison, Council Collaboration, Visual Workflows, and Study Lab
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com)
 [![React](https://img.shields.io/badge/React_18-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://react.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![Vite](https://img.shields.io/badge/Vite_6-646CFF?style=for-the-badge&logo=vite&logoColor=FFD62E)](https://vitejs.dev)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com)
-[![NVIDIA NIM](https://img.shields.io/badge/NVIDIA_NIM-76B900?style=for-the-badge&logo=nvidia&logoColor=white)](https://build.nvidia.com)
 [![SQLite](https://img.shields.io/badge/SQLite-07405E?style=for-the-badge&logo=sqlite&logoColor=white)](https://www.sqlite.org)
-[![Tests Passing](https://img.shields.io/badge/Pytest-12%20Passed-brightgreen?style=for-the-badge&logo=pytest)](https://pytest.org)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
 
 </div>
 
 ---
 
-## 🎬 Live Interactive Preview
+## Overview
 
-![Multiverse Interface Preview](./assets/multiverse-demo.svg)
+Multiverse is a local-first FastAPI, React, TypeScript, and SQLite platform for querying, collaborating across, automating, and learning with multiple language and vision models. It preserves side-by-side model comparison while adding three integrated workspaces built over a shared model execution engine, job/event tracker, deterministic verification tools, and content-hashed artifact storage:
 
----
-
-## 💡 Overview
-
-**Multiverse** is a high-throughput, concurrent AI orchestration web platform that queries multiple specialized artificial intelligence models simultaneously with a single prompt. It renders responses side-by-side in real-time, displays millisecond-accurate latency benchmarks, and visualizes internal reasoning paths.
-
-Rather than relying on closed-source, high-cost APIs with vendor lock-in, Multiverse harnesses **enterprise-grade NVIDIA NIM microservices** hosted on NVIDIA's high-speed inference clusters. Each model in Multiverse is rigorously categorized and benchmarked as a high-performance equivalent to proprietary frontier models (such as **Claude Sonnet 5.5, GPT-5 Reasoning, Claude Opus 4.6, Gemini 3.8 Flash, 4-Hydrogen, and 4-Argon**).
-
----
-
-## ⚡ Frontier Model Mapping & Benchmarking Matrix
-
-Every model on Multiverse serves a dedicated domain where its architectural parameters and fine-tuning yield optimal precision:
-
-| Model ID (NVIDIA NIM) | Model Name | Frontier Caliber Equivalent | Latency | Primary Specialization & Core Competency |
-| :--- | :--- | :--- | :--- | :--- |
-| `poolside/laguna-xs-2.1` | **Poolside Laguna XS** | **Claude Sonnet 5.5 Equivalent** | **~550 ms** | Clean asynchronous code, software architecture, concurrency & refactoring. |
-| `nvidia/nemotron-3.5-lightning-30b-a3b` | **Nemotron 3.5 Lightning** | **GPT-5 Reasoning Equivalent** | **~1.3 s** | Multi-step mathematical proofs, formal algebra, calculus & discrete logic. |
-| `nvidia/nemotron-3-ultra-550b-a55b` | **Nemotron 3 Ultra 550B** | **Claude Opus 4.6 Equivalent** | **~1.1 s** | 550B frontier knowledge base, philosophy, cosmology & deep conceptual synthesis. |
-| `nvidia/nemotron-3.5-bolt-e4b` | **Nemotron 3.5 Bolt** | **Gemini 3.8 Flash Equivalent** | **~260 ms** | Ultra-low latency, real-time summaries, quick conversational throughput. |
-| `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning` | **Nemotron Nano Omni** | **4-Hydrogen Equivalent** | **~640 ms** | Deep physical sciences, chemical reaction mechanics, thermodynamics & STEM hypotheses. |
-| `nvidia/nemotron-3.5-super-vl-120b-a12b` | **Nemotron Super VL 120B** | **4-Argon Equivalent** | **~910 ms** | Multimodal systems, robotics kinematics, state estimation & control loops. |
-| `nvidia/riva-translate-4b-instruct-v2` | **Riva Translate 4B** | **Neural Linguistic Engine** | **~155 ms** | Sub-200ms linguistic accuracy, idioms, technical translation & localization. |
+- **Compare**: Concurrent multi-model querying, intent routing, prompt enhancement, web search grounding, attachment parsing, single-model retry, and arbiter synthesis.
+- **Council**: Multi-model deliberation with built-in roles (`Chair`, `Researcher`, `Critic`, `Developer`, `Reviewer`, `Mathematician`, `Teacher`, `Fact Checker`), presets, independent parallel proposals, anonymized peer critique, bounded revision rounds, deterministic verification (`SymPy`, Python AST static checks, citation checking), preserved disagreements, Chair synthesis, member retry, fork, and downloadable reports (`PDF`, `DOCX`, `Markdown`, `JSON`).
+- **Workflows**: Interactive visual DAG editor and accessible list inspector with node palette, 7 built-in templates, Kahn topological cycle rejection, conditional branching, bounded loops, human approval gates, SSRF-validated outbound webhooks, secret-stripped JSON import/export, node retry, and artifact generation.
+- **Study Lab**: Organized into four workspaces:
+  - **Solve & Learn**: Shared document intake (`PDF`, `DOCX`, `PPTX`, `TXT`, `MD`, `PNG`, `JPG`), Assignment Solver (`Direct`, `Step-by-Step`, `Hint Only`, `Tutor`, `Council Solve`), Homework Verifier (with `SymPy` symbolic equivalence checks), Interactive Tutor / Professor Mode, Language Tutor, and interactive deterministic tools (Algorithm & Graph step traces, Pseudocode generator, 1D/2D Math plotter & numerical methods, analytical DC/AC Circuit solver, isolated Python Code Lab, and KaTeX LaTeX live editor).
+  - **Practice**: SM-2 spaced-repetition Flashcards with CSV/JSON export, Question Bank, and deterministic Exam Simulator.
+  - **Materials**: Course Notebooks, page-grounded PDF Chat & research comparison, Mind Maps, Formula Sheets, Lecture Assistant, and Presentation Maker (`.pptx` export).
+  - **Progress**: Real attempt-based Exam Analytics, Weakness Detector, and rule-based Study Planner with `.ics` export.
 
 ---
 
-## 🔬 Empirical Benchmark & Quality Verification
+## Architecture
 
-To verify whether these NVIDIA NIM models meet the expectations of modern frontier engines (**ChatGPT / Claude / Gemini caliber**), we conducted real-time validation tests across real prompts:
-
-### 1. Code Synthesis Test (Target: Claude Sonnet 5.5 Level)
-- **Model**: `poolside/laguna-xs-2.1`
-- **Prompt**: *"Write an asynchronous Python worker handling message queues with exponential backoff and SIGINT shutdown."*
-- **Outcome**: The model produced production-ready `asyncio` code with proper semaphore controls, `asyncio.Event` cancellation handling, and jittered exponential backoff in **548 ms**.
-- **Verdict**: Matches Claude Sonnet 5.5's code clarity while delivering up to **3× faster initial token generation** on NVIDIA Hopper/Ada clusters.
-
-### 2. Formal Mathematics Test (Target: GPT-5 Reasoning Level)
-- **Model**: `nvidia/nemotron-3.5-lightning-30b-a3b`
-- **Prompt**: *"Solve $2^{2x} - 3 \cdot 2^{x+2} + 32 = 0$ step-by-step."*
-- **Outcome**: Successfully performed variable substitution $u = 2^x$, factored the resulting quadratic equation $u^2 - 12u + 32 = (u - 4)(u - 8) = 0$, and derived the exact roots $x = 2$ and $x = 3$ with zero hallucinations in **1.32 s**.
-- **Verdict**: Demonstrates parity with OpenAI o-series / GPT-5 class chain-of-thought mathematical reasoning.
-
-### 3. Deep Scientific Principles Test (Target: 4-Hydrogen Level)
-- **Model**: `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning`
-- **Prompt**: *"Explain the statistical interpretation of entropy $S = k \ln \Omega$ and its relation to microstates in quantum thermodynamics."*
-- **Outcome**: Generated a rigorous derivation connecting phase space volumes, multiplicity $\Omega$, the microcanonical ensemble, and quantum degeneracy in **638 ms**.
-- **Verdict**: Fully capable of high-level academic and STEM research tasks.
-
-### 4. High-Throughput Speed Test (Target: Gemini 3.8 Flash Level)
-- **Model**: `nvidia/nemotron-3.5-bolt-e4b`
-- **Prompt**: *"Summarize the core trade-offs between Paxos and Raft consensus algorithms in three concise bullet points."*
-- **Outcome**: Delivered a precise architectural summary highlighting leader-election overhead and state-machine replication invariants in **261 ms**.
-- **Verdict**: Superior to Gemini Flash in sub-second conversational latency.
-
----
-
-## ✨ Core Platform Features
-
-- **🚀 Concurrent Asynchronous Fan-Out**: Dispatches queries simultaneously across all selected models using Python's `asyncio.gather(*tasks, return_exceptions=True)`.
-- **⏱️ Live Millisecond Latency Benchmarks**: High-resolution response timers directly on each card so you can evaluate speed vs. quality tradeoffs in real-time.
-- **🎯 Smart Semantic Intent Routing**: Heuristic and semantic query classifier automatically suggests the ideal frontier equivalent (Coding, Math, Science, Translation, Fast dialogue).
-- **🔄 Isolated Resilient Retry**: Allows retrying any individual model on failure or timeout without re-triggering or invalidating other responses.
-- **💾 Full Persistent History**: Powered by SQLAlchemy 2.0 and SQLite, storing conversation sessions, turns, latencies, and token counts.
-- **🎨 Modern Cyberpunk UI**: Built with React 18, Vite, and Tailwind CSS. Features full Markdown rendering, syntax-highlighted code blocks, one-click copy, and responsive column grids.
-
----
-
-## 🛠️ Architecture & Tech Stack
-
-```
+```text
 multiverse/
 ├── backend/
 │   ├── app/
-│   │   ├── main.py              # FastAPI application with CORS & lifespan DB init
-│   │   ├── config.py            # Environment settings & Pydantic validation
-│   │   ├── database.py          # SQLAlchemy 2.0 Async engine & sessionmaker
-│   │   ├── models.py            # SQLite ORM models (Conversation, Turn, Response)
-│   │   ├── schemas.py           # Pydantic v2 validation schemas
-│   │   ├── providers/
-│   │   │   ├── base.py          # Abstract base LLM provider interface
-│   │   │   ├── nvidia.py        # Async NVIDIA NIM OpenAI-compatible client
-│   │   │   └── registry.py      # Active NVIDIA model registry & frontier metadata
-│   │   └── services/
-│   │       ├── comparison_service.py # Parallel asynchronous orchestration
-│   │       └── routing_service.py    # Intent-based model recommendation
-│   ├── tests/                   # Pytest suite with mock AsyncOpenAI clients
-│   └── requirements.txt
-│
-├── frontend/
-│   ├── src/
-│   │   ├── components/          # React components (Grid, Card, ModelSelector, etc.)
-│   │   ├── services/api.ts      # Axios API client with full TypeScript types
-│   │   ├── types/index.ts       # Shared TypeScript interfaces
-│   │   └── App.tsx              # Root reactive layout
-│   └── package.json
-└── assets/
-    └── multiverse-demo.svg      # Animated vector demo showcase
+│   │   ├── api/            # FastAPI routers (models, compare, conversations, router, upload, jobs, artifacts, council, workflows, study)
+│   │   ├── core/           # Configuration & storage paths
+│   │   ├── council/        # Council roles, presets, execution protocol, and reports
+│   │   ├── database/       # Async SQLAlchemy engine (SQLite NullPool) and ORM models
+│   │   ├── execution/      # ExecutionEngine, ExecutionBudget, local-only policy, JobManager
+│   │   ├── exports/        # ReportLab PDF (Unicode TTF), DOCX, PPTX, Markdown, JSON, CSV, ICS exporters
+│   │   ├── providers/      # NVIDIA NIM provider, LocalOpenAIProvider (Ollama/LM Studio/llama.cpp/MLX), ModelRegistry
+│   │   ├── services/       # Comparison, routing, prompt enhancement, web search, artifact storage
+│   │   ├── study/          # Document intake, solver, verifier, PDF chat, flashcards, exams, analytics, planner
+│   │   ├── tools/          # SymPy math/numerical methods, algorithm traces, circuit solver, Python sandbox, document parser
+│   │   └── workflows/      # Typed node catalog, 7 templates, DAG validator, safe templating, execution engine
+│   └── tests/              # Unit, integration, adversarial, and export round-trip tests
+└── frontend/
+    └── src/
+        ├── components/     # Shared Header, Sidebar, ChatInput, ComparisonGrid, ModelSelector, ApiKeyModal, MarkdownRenderer
+        ├── features/
+        │   ├── council/    # CouncilWorkspace
+        │   ├── workflows/  # WorkflowsWorkspace (interactive canvas + accessible list mode)
+        │   └── study/      # StudyLabWorkspace & InteractiveLearningPanel
+        ├── i18n/           # English and Turkish localization
+        └── services/       # Typed API client
 ```
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
+
 - Python 3.10+
 - Node.js 18+ and npm
-- An API Key from [NVIDIA Build](https://build.nvidia.com) (free tier includes initial credits)
+- At least one inference option:
+  - An API key from [NVIDIA Build](https://build.nvidia.com) (configured in `backend/.env`), or
+  - A local OpenAI-compatible inference server such as Ollama (`http://127.0.0.1:11434/v1`), LM Studio (`http://127.0.0.1:1234/v1`), `llama.cpp` server (`http://127.0.0.1:8080/v1`), or `mlx-lm` server (`http://127.0.0.1:8081/v1`).
 
-### 1. One-Click Launch
-```bash
-git clone https://github.com/zeynepiremakbulut/multiverse.git
-cd multiverse
+### Backend Setup
 
-# Set your API Key
-export NVIDIA_API_KEY="your_nvidia_api_key_here"
-
-# Start both backend and frontend automatically
-./start.sh
-```
-
-### 2. Manual Installation
-
-#### Backend Setup
 ```bash
 cd backend
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
-
-# Create .env file with your NVIDIA API Key
 cp .env.example .env
-# Edit .env and paste: NVIDIA_API_KEY=nvapi-...
-
-# Run FastAPI backend
+# Optionally set NVIDIA_API_KEY in backend/.env
 uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
-#### Frontend Setup
+### Frontend Setup
+
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-Open your browser at **`http://localhost:5173`**.
+Open `http://127.0.0.1:5173`.
 
 ---
 
-## 🧪 Automated Testing
+## Optional Local Tools & Hardware Notes
 
-Multiverse includes a comprehensive test suite verifying database migrations, concurrency routines, intent routing, and API error resilience:
+- **Local Inference**: Ollama, LM Studio, `llama.cpp`, and `mlx-lm` run models locally on your hardware (memory and compute vary by model quantization). Enable **Local-Only Mode** in the Providers & Policy modal to block external model calls.
+- **Tesseract OCR (`tesseract`)**: Optional system binary for extracting text from scanned PDFs and uploaded images. When absent, Study Lab reports that local OCR is unavailable rather than fabricating OCR results.
+- **Audio Transcription (`faster-whisper` / `whisper`)**: Optional Python packages for offline audio transcription in Lecture Assistant. Without them, Lecture Assistant operates on pasted or uploaded text transcripts.
+- **Circuit Simulation (`ngspice`)**: Optional system binary. Built-in DC/AC circuit topologies run via an exact analytical solver and report whether `ngspice` is present on the host.
+
+---
+
+## Automated Testing & Verification
+
+Run the backend test suite (uses explicit test-only provider fakes for deterministic workflow/Council/Study Lab tests without consuming paid API quota):
 
 ```bash
 cd backend
-source venv/bin/activate
-pytest -v
+./venv/bin/pytest -v
 ```
 
-Expected output:
-```text
-tests/test_api.py::test_health_endpoint PASSED                           [  8%]
-tests/test_api.py::test_list_models PASSED                              [ 16%]
-tests/test_api.py::test_route_intent_coding PASSED                       [ 25%]
-tests/test_api.py::test_route_intent_math PASSED                         [ 33%]
-tests/test_api.py::test_create_and_get_conversation PASSED               [ 41%]
-tests/test_api.py::test_compare_single_model PASSED                     [ 50%]
-tests/test_api.py::test_compare_multiple_models_concurrently PASSED     [ 58%]
-tests/test_api.py::test_retry_single_model PASSED                        [ 66%]
-tests/test_api.py::test_conversation_history PASSED                     [ 75%]
-tests/test_api.py::test_invalid_model_handling PASSED                    [ 83%]
-tests/test_api.py::test_empty_prompt_validation PASSED                   [ 91%]
-tests/test_api.py::test_all_intent_categories PASSED                    [100%]
+Verify frontend TypeScript compilation and production bundling:
 
-============================== 12 passed in 1.15s ==============================
+```bash
+cd frontend
+./node_modules/.bin/tsc --noEmit && ./node_modules/.bin/vite build
 ```
 
 ---
 
-## 🔒 Security & Privacy Notice
+## Security & Limitations
 
-- **Zero Credential Leaks**: API keys are loaded exclusively from local environment variables or uncommitted `.env` files. The repository strictly ignores local database files and environment credentials.
-- **Local Storage**: All prompt histories, latencies, and responses are stored in your local SQLite database (`multiverse.db`) without third-party analytics.
+- **Server-Side Keys & Secret Stripping**: API keys are loaded server-side from `backend/.env` and excluded from browser bundles, logs, and workflow exports. Imported workflows strip secret-like keys and disable imported `code` and `webhook` nodes until approved by the owner.
+- **SSRF & Sandbox Protections**: Webhook URLs reject private, loopback, link-local, and metadata IP ranges and disable HTTP redirects. Python Code Lab checks AST imports/calls and executes inside an isolated temporary directory without network access.
+- **Local-First Scope**: Designed as a single-user local workspace; if deployed on a shared host, add authentication and per-user tenant isolation before exposing endpoints beyond localhost.
+- **Disabled Placeholder Nodes**: `MCP Tool` and `Delay / Schedule` workflow nodes are marked unavailable unless an external MCP server or persistent job scheduler is configured.
 
 ---
 
-## 📄 License
+## License
 
 This project is open-source under the [MIT License](LICENSE).
